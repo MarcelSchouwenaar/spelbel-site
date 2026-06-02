@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{APP_NAME}} – Push notificaties</title>
+  <link rel="stylesheet" href="/css/app.css">
+  <style>
+    body { max-width: 480px; margin: 60px auto; padding: 0 24px; font-family: -apple-system, sans-serif; }
+    h1 { font-size: 1.4rem; margin-bottom: 8px; }
+    p  { color: #555; margin-bottom: 24px; }
+    .btn { display: inline-block; background: #3182ce; color: #fff; border: none; border-radius: 8px;
+           padding: 12px 24px; font-size: 1rem; cursor: pointer; width: 100%; margin-bottom: 12px; }
+    .btn:disabled { background: #aaa; cursor: default; }
+    .btn-secondary { background: #4a5568; }
+    #status { padding: 12px 16px; border-radius: 8px; font-size: .9rem; display: none; margin-top: 16px; }
+    .ok  { background: #f0fff4; border: 1px solid #9ae6b4; color: #276749; }
+    .err { background: #fff5f5; border: 1px solid #feb2b2; color: #c53030; }
+    .info{ background: #ebf8ff; border: 1px solid #90cdf4; color: #2b6cb0; }
+  </style>
+</head>
+<body>
+  <div><img src="/images/logo.svg" alt="{{APP_NAME}}" style="height:48px;margin-bottom:20px"></div>
+  <h1>Push notificaties</h1>
+  <p>Ontvang een melding op dit apparaat wanneer een Spel Bel overgaat — zonder WhatsApp of Telegram.</p>
+
+  <button class="btn" id="btn-subscribe">🔔 Meldingen inschakelen</button>
+  <button class="btn btn-secondary" id="btn-test" disabled>📤 Testmelding versturen</button>
+  <button class="btn btn-secondary" id="btn-unsubscribe" style="display:none">🔕 Meldingen uitschakelen</button>
+
+  <div id="status"></div>
+
+  <script>
+    const VAPID_PUBLIC_KEY = '{{VAPID_PUBLIC_KEY}}';
+    const APP_URL = '{{APP_URL}}';
+
+    const btnSubscribe   = document.getElementById('btn-subscribe');
+    const btnTest        = document.getElementById('btn-test');
+    const btnUnsubscribe = document.getElementById('btn-unsubscribe');
+    const statusEl       = document.getElementById('status');
+
+    function showStatus(msg, type = 'info') {
+      statusEl.textContent = msg;
+      statusEl.className = type;
+      statusEl.style.display = 'block';
+    }
+
+    function urlBase64ToUint8Array(base64String) {
+      const padding = '='.repeat((4 - base64String.length % 4) % 4);
+      const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+      return Uint8Array.from([...atob(base64)].map(c => c.charCodeAt(0)));
+    }
+
+    async function init() {
+      if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+        showStatus('❌ Deze browser ondersteunt geen push notificaties.', 'err');
+        btnSubscribe.disabled = true;
+        return;
+      }
+      const reg = await navigator.serviceWorker.register('/sw.js');
+      const existing = await reg.pushManager.getSubscription();
+      if (existing) {
+        btnSubscribe.style.display = 'none';
+        btnUnsubscribe.style.display = '';
+        btnTest.disabled = false;
+        showStatus('✅ Meldingen zijn ingeschakeld op dit apparaat.', 'ok');
+      }
+    }
+
+    btnSubscribe.addEventListener('click', async () => {
+      try {
+        const permission = await Notification.requestPermission();
+        if (permission !== 'granted') {
+          showStatus('❌ Toestemming geweigerd. Sta meldingen toe in je browserinstellingen.', 'err');
+          return;
+        }
+        btnSubscribe.disabled = true;
+        btnSubscribe.textContent = 'Bezig…';
+        const reg = await navigator.serviceWorker.ready;
+        const sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY) });
+        const res = await fetch(APP_URL + '/webhook/subscribe/push', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(sub.toJSON()),
+        });
+        if (!res.ok) throw new Error(await res.text());
+        btnSubscribe.style.display = 'none';
+        btnUnsubscribe.style.display = '';
+        btnTest.disabled = false;
+        showStatus('✅ Gelukt! Je ontvangt nu een melding wanneer een Spel Bel overgaat.', 'ok');
+      } catch (err) {
+        btnSubscribe.disabled = false;
+        btnSubscribe.textContent = '🔔 Meldingen inschakelen';
+        showStatus('❌ ' + err.message, 'err');
+      }
+    });
+
+    btnTest.addEventListener('click', async () => {
+      btnTest.disabled = true; btnTest.textContent = 'Versturen…';
+      const res = await fetch(APP_URL + '/webhook/push/test', { method: 'POST' });
+      btnTest.disabled = false; btnTest.textContent = '📤 Testmelding versturen';
+      showStatus(res.ok ? '📤 Testmelding verstuurd!' : '❌ Versturen mislukt.', res.ok ? 'ok' : 'err');
+    });
+
+    btnUnsubscribe.addEventListener('click', async () => {
+      const reg = await navigator.serviceWorker.ready;
+      const sub = await reg.pushManager.getSubscription();
+      if (sub) {
+        await fetch(APP_URL + '/webhook/subscribe/push', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ endpoint: sub.endpoint }) });
+        await sub.unsubscribe();
+      }
+      btnUnsubscribe.style.display = 'none';
+      btnSubscribe.style.display = ''; btnSubscribe.disabled = false;
+      btnTest.disabled = true;
+      showStatus('🔕 Meldingen uitgeschakeld.', 'info');
+    });
+
+    init();
+  </script>
+</body>
+</html>
