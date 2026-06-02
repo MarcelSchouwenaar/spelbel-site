@@ -101,6 +101,4 @@ These are set in the Railway service and do not need to change often:
 
 Spel Bel is a neighbourhood doorbell system built by [ScrollScrollScroll](https://www.scrollscrollscroll.nl). A physical button is installed at a playground. When a child presses it, parents in the neighbourhood receive a WhatsApp, Telegram, Signal, or browser notification — so they know it's time to go outside and play.
 
-The project was initiated by Puck Siemerink and Marcel Schouwenaar and is currently being piloted in Rotterdam with support from Wijkraad Blijdorp, Bergpolder en Liskwartier.
-
 This website is the public face of the project: it explains what Spel Bel is, lets visitors subscribe to a specific doorbell, and handles push notification preferences.

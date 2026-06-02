@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800">
+  <defs>
+    <style>
+      .cls-faq {
+        fill: none;
+        stroke: #d4f04c;
+        stroke-width: 3;
+      }
+    </style>
+  </defs>
+  <path d="M0,200 Q300,100 600,150 T1200,200 L1200,800 L0,800 Z" fill="#d4f04c" opacity="1"/>
+</svg>
