@@ -382,3 +382,134 @@ body.auth-page {
   color: #555;
   word-break: break-all;
 }
+
+/* ── FAQ & Accordion ────────────────────────────────────── */
+.faq {
+  padding: 56px 24px;
+  background: #d4f04c;
+}
+
+.faq-inner {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.faq h3 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 32px;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.accordion {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.accordion details {
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.accordion summary {
+  padding: 16px 20px;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 1rem;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: background-color .15s;
+}
+
+.accordion summary:hover {
+  background-color: #f5f5f5;
+}
+
+.accordion summary::after {
+  content: '▼';
+  font-size: .7rem;
+  display: inline-block;
+  transition: transform .2s;
+  margin-left: 12px;
+}
+
+.accordion details[open] summary::after {
+  transform: rotate(-180deg);
+}
+
+.accordion-content {
+  padding: 0 20px 16px 20px;
+  color: #333;
+  font-weight: 400;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.accordion-content p {
+  margin: 0;
+}
+
+.accordion-content a {
+  color: #DD4A93;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* ── News Section ──────────────────────────────────────── */
+.news {
+  padding: 56px 24px;
+  background: #87ceeb;
+}
+
+.news-inner {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.news h3 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 32px;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.news-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 16px;
+}
+
+.news-item {
+  background: #fff;
+  border-radius: 12px;
+  padding: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  text-decoration: none;
+  transition: transform .15s, box-shadow .15s;
+  min-height: 120px;
+  box-shadow: 0 2px 8px rgba(0,0,0,.08);
+}
+
+.news-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0,0,0,.12);
+  text-decoration: none;
+}
+
+.news-title {
+  color: #111;
+  font-weight: 700;
+  font-size: 0.95rem;
+  line-height: 1.3;
+}
