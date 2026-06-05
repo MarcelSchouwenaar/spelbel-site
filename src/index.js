@@ -21,6 +21,11 @@ app.get('/', (req, res) => {
     }));
 });
 
+// Thank you page
+app.get('/thankyou', (req, res) => {
+    res.send(render('thankyou.html', { APP_NAME }));
+});
+
 // Privacy policy
 app.get('/privacy', (req, res) => {
     res.send(render('privacy.html', { APP_NAME }));

@@ -1,2 +1,5 @@
 node_modules/
 .env
+.claude/agent-memory/spelbel-webmaster/MEMORY.md
+.DS_Store
+public/images/video-spelbel.mp4

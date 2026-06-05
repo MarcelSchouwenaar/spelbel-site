@@ -6,40 +6,65 @@
   <title>{{APP_NAME}} – Speeltuin deurbel via WhatsApp &amp; Telegram</title>
   <meta name="description" content="{{APP_NAME}} stuurt een berichtje als de bel op de speeltuin gaat. Geen app nodig — werkt via WhatsApp of Telegram.">
   <link rel="stylesheet" href="/css/app.css">
+  <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
   <header>
     <div class="logo"><img src="/images/logo.svg" alt="{{APP_NAME}} Logo"></div>
-    <a class="btn btn-header" href="#" data-u="{{CONTACT_EMAIL_USER}}" data-d="{{CONTACT_EMAIL_DOMAIN}}"
-       onclick="this.href='mailto:'+this.dataset.u+'@'+this.dataset.d">Vraag een Spel Bel aan</a>
+    <nav class="main-nav">
+      <a href="#how">Hoe werkt het?</a>
+      <a href="#nieuws">In het nieuws</a>
+    </nav>
+    <a class="btn btn-header" href="https://05429a6a.sibforms.com/serve/MUIFAGtScEacwJ_INYphqgMXzwtrCjmLcBiIKa4ToBHrGd0Mz_QTOBSWjbFkfws592HgCzSQhTVC4G0e9giGd4Boirs3QZhhvhQw43so12y6Z9_myTVBKrL_mnUg2fQwT9z3Rh0D1k5hxNoBynGdZbs6M_T_9eJGcakkoLoUUpn-hamxAgDHEiQCQd-i7uFtEPjD56_-9l-Y0MRmbg==" target="_blank" rel="noopener">Nieuwsbrief</a>
   </header>
 
   <section class="hero">
-    
-    <div>
-      <h2>Druk op de bel<br>& Speel samen!</h2>
-      <p>Met de Spel Bel weten alle ouders in de buurt wanneer er wordt buitengespeeld.</p>
+    <div class="hero-text">
+      <div class="hero-badge">
+        <span class="badge-dot"></span>
+        <span>Nu live in Rotterdam</span>
+      </div>
+      <h2>Druk op de bel<br>&amp; Speel samen!</h2>
+      <p>De Spel Bel stuurt een seintje naar alle ouders in de buurt zodra er iemand buiten wil spelen. Éen druk op de knop, en de hele straat weet het.</p>
+      <a class="btn btn-hero" href="#how">Hoe werkt het?</a>
     </div>
     <img src="/images/spelbel-foto-2.png" alt="De eerste Spel Bel!">
-    </p>
   </section>
-  <section class="cta">
-    <div class="cta-inner">
-      <h3>Vraag ook een Spel Bel aan!</h3>
-      <p>Momenteel worden de eerste Spel Bellen getest in Rotterdam, met dank aan <a href="https://www.instagram.com/wijkraad.bbl/" target="_blank" rel="noopener">Wijkraad Blijdorp, Bergpolder en Liskwartier</a> in Rotterdam.  </p>
-      <a class="btn" href="#" data-u="{{CONTACT_EMAIL_USER}}" data-d="{{CONTACT_EMAIL_DOMAIN}}"
-         onclick="this.href='mailto:'+this.dataset.u+'@'+this.dataset.d">Wij willen ook een Spel Bel!</a>
+
+  <section class="problem">
+    <div class="problem-inner">
+      <h2>Wat is het probleem?</h2>
+      <div class="stat-cards">
+        <div class="stat-card">
+          <div class="stat-num">55%</div>
+          <p class="stat-text">van de kinderen wil vaker buiten spelen dan ze nu doen.</p>
+          <p class="stat-source">Jantje Beton, 2026</p>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num">#1</div>
+          <p class="stat-text">reden om niet naar buiten te gaan: Te weinig andere kinderen buiten.</p>
+          <p class="stat-source">Jantje Beton, 2026</p>
+        </div>
+      </div>
     </div>
   </section>
 
-  <section class="how">
+  <section class="cta">
+    <div class="cta-inner">
+      <h3>Willen kinderen in jouw buurt ook meer buiten spelen?</h3>
+      <p>Een Spel Bel zet kinderen in beweging en verbindt buren. Vraag hem aan voor jouw wijk</p>
+      <a class="btn" href="https://form.typeform.com/to/uRGA1iE8" target="_blank" rel="noopener">Wij willen een Spel Bel!</a>
+    </div>
+  </section>
+
+  <section class="how" id="how">
     <div class="how-inner">
       <h3>Hoe werkt het?</h3>
       <div class="steps">
         <div class="step">
           <div class="num">1</div>
           <div class="step-text">
-            <strong>Scan de QR-code bij de speeltuin</strong>
+            <strong>Scan de QR-code bij de speeltuin — eenmalig, in 10 seconden</strong>
           </div>
         </div>
         <div class="step">
@@ -51,16 +76,25 @@
         <div class="step">
           <div class="num">3</div>
           <div class="step-text">
-            <strong>Je krijgt een seintje als de bel gaat</strong>
+            <strong>Zodra iemand op de bel drukt, krijg jij direct een seintje</strong>
           </div>
         </div>
         <div class="step">
           <div class="num">4</div>
           <div class="step-text">
-            <strong>Afmelden kan altijd via de link in het bericht</strong>
+            <strong>Trek je jas aan en ga — afmelden kan altijd via de link in het bericht</strong>
           </div>
         </div>
       </div>
+    </div>
+  </section>
+
+  <section class="video-section">
+    <div class="video-inner">
+      <h3>Zie de Spel Bel in actie</h3>
+      <video controls playsinline>
+        <source src="/images/video-spelbel.mp4" type="video/mp4">
+      </video>
     </div>
   </section>
 
@@ -120,7 +154,7 @@
     </div>
   </section>
 
-  <section class="news">
+  <section class="news" id="nieuws">
     <div class="news-inner">
       <h3>In het nieuws</h3>
       <div class="news-grid">
