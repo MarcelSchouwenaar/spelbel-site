@@ -7,7 +7,7 @@ const { render } = require('./lib/render');
 const app = express();
 const PORT = process.env.PORT || 3001;
 const APP_URL = (process.env.APP_URL || '').replace(/\/$/, '');
-const APP_NAME = process.env.APP_NAME || 'Spel Bel';
+const APP_NAME = process.env.APP_NAME || 'Spelbel';
 
 app.use(express.static(path.join(__dirname, '..', 'public')));
 
@@ -144,4 +144,4 @@ function buildPushSection(doorbellId, vapidKey, appUrl) {
 // Health check
 app.get('/health', (req, res) => res.json({ status: 'ok', uptime: Math.floor(process.uptime()) }));
 
-app.listen(PORT, () => console.log(`[Spel Bel Site] Running on port ${PORT}`));
+app.listen(PORT, () => console.log(`[Spelbel Site] Running on port ${PORT}`));

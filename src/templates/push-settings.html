@@ -31,19 +31,19 @@
 <body>
   <div class="logo"><img src="/images/logo.svg" alt="{{APP_NAME}}"></div>
   <h1>Meldingsinstellingen</h1>
-  <p class="sub">Beheer je browsermeldingen voor Spel Bel op dit apparaat.</p>
+  <p class="sub">Beheer je browsermeldingen voor Spelbel op dit apparaat.</p>
 
   <div id="loading">Laden…</div>
   <div id="no-token" style="display:none">
     <p>Geen abonnement gevonden op dit apparaat.</p>
-    <p style="font-size:.9rem">Meld je aan via de QR-code bij een Spel Bel.</p>
+    <p style="font-size:.9rem">Meld je aan via de QR-code bij een Spelbel.</p>
   </div>
 
   <div id="content" style="display:none">
     <div id="snooze-active" class="snooze-active" style="display:none"></div>
 
     <div class="card">
-      <h2>Mijn Spel Bellen</h2>
+      <h2>Mijn Spelbellen</h2>
       <div id="bells-list"></div>
     </div>
 
@@ -90,7 +90,7 @@
       // Bell list
       const list = document.getElementById('bells-list');
       if (!data.doorbells.length) {
-        list.innerHTML = '<p style="color:#888;font-size:.9rem">Je bent niet aangemeld voor een specifieke Spel Bel.</p>';
+        list.innerHTML = '<p style="color:#888;font-size:.9rem">Je bent niet aangemeld voor een specifieke Spelbel.</p>';
       } else {
         list.innerHTML = data.doorbells.map(b => `
           <div class="bell-row">
@@ -121,7 +121,7 @@
     }
 
     async function removeBell(doorbellId, btn) {
-      if (!confirm('Afmelden voor deze Spel Bel?')) return;
+      if (!confirm('Afmelden voor deze Spelbel?')) return;
       btn.disabled = true;
       const res = await fetch('{{APP_URL}}/webhook/push/doorbell', {
         method: 'DELETE', headers: { 'Content-Type': 'application/json' },
@@ -132,7 +132,7 @@
     }
 
     async function unsubscribeAll() {
-      if (!confirm('Alle browsermeldingen van Spel Bel uitschakelen op dit apparaat?')) return;
+      if (!confirm('Alle browsermeldingen van Spelbel uitschakelen op dit apparaat?')) return;
       const reg = await navigator.serviceWorker.getRegistration('/sw.js').catch(() => null);
       const sub = reg ? await reg.pushManager.getSubscription() : null;
       if (sub) await sub.unsubscribe();

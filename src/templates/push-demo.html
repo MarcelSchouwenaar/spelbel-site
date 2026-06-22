@@ -22,7 +22,7 @@
 <body>
   <div><img src="/images/logo.svg" alt="{{APP_NAME}}" style="height:48px;margin-bottom:20px"></div>
   <h1>Push notificaties</h1>
-  <p>Ontvang een melding op dit apparaat wanneer een Spel Bel overgaat — zonder WhatsApp of Telegram.</p>
+  <p>Ontvang een melding op dit apparaat wanneer een Spelbel overgaat — zonder WhatsApp of Telegram.</p>
 
   <button class="btn" id="btn-subscribe">🔔 Meldingen inschakelen</button>
   <button class="btn btn-secondary" id="btn-test" disabled>📤 Testmelding versturen</button>
@@ -85,7 +85,7 @@
         btnSubscribe.style.display = 'none';
         btnUnsubscribe.style.display = '';
         btnTest.disabled = false;
-        showStatus('✅ Gelukt! Je ontvangt nu een melding wanneer een Spel Bel overgaat.', 'ok');
+        showStatus('✅ Gelukt! Je ontvangt nu een melding wanneer een Spelbel overgaat.', 'ok');
       } catch (err) {
         btnSubscribe.disabled = false;
         btnSubscribe.textContent = '🔔 Meldingen inschakelen';
