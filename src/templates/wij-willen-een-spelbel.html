@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wij willen een Spel Bel! — spelbel.nl</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="stylesheet" href="/css/app.css">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --blauw: #BFE5F5; --blauw-licht: #DCF1FA; --magenta: #DD4A93; --magenta-donker: #b8307a;
+    --geel: #FFD400; --zwart: #1A1A1A; --wit: #ffffff; --grijs: #F4F6F5; --grijs-rand: #E2E6E5;
+    --tekst: #1A1A1A; --tekst-licht: #5A6360;
+  }
+  html { scroll-behavior: smooth; }
+  body { font-family: 'Nunito', sans-serif; background: var(--blauw); color: var(--tekst); line-height: 1.6; overflow-x: hidden; }
+  h1, h2, h3 { font-family: 'Tomarik', 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif; font-weight: 400; }
+
+  header { background: #fff; }
+
+  .hero { background: var(--blauw); padding: 44px 24px 36px; margin: 0; text-align: center; position: relative; overflow: hidden; }
+  .hero::before, .hero::after { content: '🔔'; position: absolute; font-size: 110px; opacity: 0.08; pointer-events: none; }
+  .hero::before { top: 10px; left: -20px; transform: rotate(-20deg); }
+  .hero::after { bottom: -20px; right: -10px; transform: rotate(15deg); }
+  .hero-inner { max-width: 720px; margin: 0 auto; position: relative; z-index: 2; }
+  .hero-badge { display: inline-flex; align-items: center; gap: 8px; background: var(--wit); color: var(--magenta); font-weight: 800; font-size: 13px; letter-spacing: 0.5px; text-transform: uppercase; padding: 8px 18px; border-radius: 24px; margin-bottom: 20px; box-shadow: 0 4px 14px rgba(0,0,0,0.08); }
+  .hero-badge .puls { width: 8px; height: 8px; border-radius: 50%; background: var(--magenta); animation: puls 1.5s infinite; }
+  @keyframes puls { 0%{box-shadow:0 0 0 0 rgba(236,14,115,0.5);} 70%{box-shadow:0 0 0 8px rgba(236,14,115,0);} 100%{box-shadow:0 0 0 0 rgba(236,14,115,0);} }
+  .hero h1 { font-size: clamp(34px, 6vw, 56px); line-height: 1.05; color: var(--zwart); margin-bottom: 14px; font-weight: 700; }
+  .hero h1 .magenta { color: var(--magenta); }
+  .hero p { font-size: 18px; color: var(--zwart); max-width: 560px; margin: 0 auto; font-weight: 600; }
+
+  .kaart-sectie { max-width: 1240px; margin: 0 auto; padding: 28px 24px 60px; }
+  .kaart-card { background: var(--wit); border-radius: 28px; overflow: hidden; box-shadow: 0 16px 50px rgba(0,0,0,0.12); position: relative; }
+  .kaart-header { padding: 18px 24px; border-bottom: 2px solid var(--grijs); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+  .kaart-header h3 { font-size: 21px; color: var(--zwart); display: flex; align-items: center; gap: 8px; }
+  .kaart-header-rechts { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .kaart-zoek { display: flex; align-items: center; gap: 8px; background: var(--grijs); border-radius: 22px; padding: 8px 16px; min-width: 200px; }
+  .kaart-zoek input { border: none; background: none; outline: none; font-family: 'Nunito', sans-serif; font-size: 14px; font-weight: 600; width: 100%; color: var(--zwart); }
+  .kaart-zoek-wrap { position: relative; }
+  .zoek-resultaten { position: absolute; top: calc(100% + 6px); left: 0; right: 0; background: var(--wit); border-radius: 16px; box-shadow: 0 8px 30px rgba(0,0,0,0.18); overflow: hidden; z-index: 700; display: none; }
+  .zoek-resultaten.open { display: block; }
+  .zoek-item { padding: 11px 16px; font-size: 14px; font-weight: 600; color: var(--zwart); cursor: pointer; border-bottom: 1px solid var(--grijs); display: flex; align-items: center; gap: 8px; }
+  .zoek-item:last-child { border-bottom: none; }
+  .zoek-item:hover { background: var(--blauw-licht); }
+  .zoek-item .plaats-sub { font-size: 12px; color: var(--tekst-licht); font-weight: 600; }
+  .zoek-leeg { padding: 12px 16px; font-size: 13px; color: var(--tekst-licht); font-weight: 600; }
+  .kaart-wrap { position: relative; }
+  #kaart { height: 540px; width: 100%; background: var(--blauw-licht); cursor: grab; }
+  #kaart.plaatsmodus, #kaart.plaatsmodus .leaflet-grab, #kaart.plaatsmodus .leaflet-interactive, #kaart.plaatsmodus .leaflet-container { cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 48 48'%3E%3Ccircle cx='24' cy='24' r='21' fill='%23DD4A93' stroke='%231A1A1A' stroke-width='3'/%3E%3Cpath d='M24 13 L24 35 M13 24 L35 24' stroke='white' stroke-width='5' stroke-linecap='round'/%3E%3C/svg%3E") 24 24, crosshair !important; }
+  .kaart-wrap.plaatsmodus-actief { box-shadow: inset 0 0 0 4px var(--magenta); border-radius: 0 0 28px 28px; }
+  .kaart-wrap.plaatsmodus-actief::after { content: ''; position: absolute; inset: 0; background: rgba(236,14,115,0.04); pointer-events: none; z-index: 500; }
+  .kaart-hint { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 600; background: var(--zwart); color: var(--wit); font-weight: 700; font-size: 14px; padding: 10px 20px; border-radius: 24px; box-shadow: 0 6px 20px rgba(0,0,0,0.25); display: flex; align-items: center; gap: 10px; max-width: 90%; text-align: center; }
+  .kaart-hint.plaatsen { background: var(--magenta); font-size: 15px; animation: hint-puls 1.4s ease-in-out infinite; }
+  @keyframes hint-puls { 0%,100%{transform:translateX(-50%) scale(1);} 50%{transform:translateX(-50%) scale(1.05);} }
+  .kaart-hint .sluit-hint { background: rgba(255,255,255,0.2); border: none; color: var(--wit); width: 22px; height: 22px; border-radius: 50%; cursor: pointer; font-size: 13px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .plaats-knop {
+    position: absolute; top: 20px; left: 50%; transform: translateX(-50%); z-index: 600;
+    background: var(--magenta); color: var(--wit); border: none; border-radius: 16px;
+    padding: 14px 32px; font-family: 'Tomarik', 'Trebuchet MS', 'Lucida Sans Unicode', Arial, sans-serif;
+    font-size: 24px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em;
+    cursor: pointer; box-shadow: 6px 6px 0 #000; transition: transform 0.15s;
+    display: flex; align-items: center; gap: 10px; white-space: nowrap;
+  }
+  .plaats-knop:hover { transform: translateX(-50%) translateY(-2px); }
+  .plaats-knop:active { transform: translateX(-50%) translateY(-2px); }
+  .plaats-knop.actief { background: var(--zwart); }
+  .speeltuin-marker { display: flex; align-items: center; justify-content: center; border-radius: 50%; border: 3px solid var(--zwart); background: var(--magenta); color: var(--wit); font-family: 'Tomarik', 'Trebuchet MS', 'Lucida Sans Unicode', Arial, sans-serif; font-weight: 700; box-shadow: 0 3px 0 var(--zwart); transition: transform 0.15s; cursor: pointer; }
+  .speeltuin-marker:hover { transform: scale(1.12); }
+
+  .paneel-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.55); z-index: 2000; opacity: 0; pointer-events: none; transition: opacity 0.3s; display: flex; align-items: center; justify-content: center; padding: 24px; }
+  .paneel-overlay.open { opacity: 1; pointer-events: auto; }
+  .paneel { position: relative; width: 460px; max-width: 100%; max-height: 90vh; background: var(--wit); z-index: 2001; border-radius: 26px; transform: scale(0.92); opacity: 0; transition: transform 0.32s cubic-bezier(0.34,1.3,0.64,1), opacity 0.25s; overflow-y: auto; box-shadow: 0 24px 70px rgba(0,0,0,0.3); }
+  .paneel.open { transform: scale(1); opacity: 1; }
+  .paneel-kop { background: var(--blauw); padding: 24px 28px 20px; position: relative; border-radius: 26px 26px 0 0; }
+  .paneel-sluit { position: absolute; top: 18px; right: 18px; background: var(--wit); border: none; width: 38px; height: 38px; border-radius: 50%; cursor: pointer; font-size: 18px; color: var(--tekst); box-shadow: 0 2px 8px rgba(0,0,0,0.1); transition: transform 0.15s; }
+  .paneel-sluit:hover { transform: rotate(90deg); }
+  .paneel-kop h3 { font-size: 25px; color: var(--zwart); margin-bottom: 4px; padding-right: 40px; }
+  .paneel-plaats { font-size: 14px; color: var(--magenta-donker); font-weight: 700; display: flex; align-items: center; gap: 5px; }
+  .paneel-body { padding: 24px 28px 32px; }
+  .paneel-teller { background: var(--zwart); color: var(--wit); border-radius: 18px; padding: 18px; text-align: center; margin-bottom: 20px; position: relative; overflow: hidden; }
+  .paneel-teller::after { content: '🔔'; position: absolute; font-size: 80px; opacity: 0.08; right: -8px; bottom: -16px; }
+  .paneel-teller-getal { font-family: 'Tomarik', 'Trebuchet MS', 'Lucida Sans Unicode', Arial, sans-serif; font-size: 46px; font-weight: 700; color: var(--geel); line-height: 1; }
+  .paneel-teller-label { font-size: 13px; color: #B8B8B8; font-weight: 600; margin-top: 4px; }
+  .deelnemers-titel { font-weight: 800; font-size: 14px; margin-bottom: 10px; color: var(--zwart); }
+  .deelnemer-rij { display: flex; align-items: center; gap: 12px; padding: 9px 0; border-bottom: 1px solid var(--grijs); }
+  .avatar { width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: 'Tomarik', 'Trebuchet MS', 'Lucida Sans Unicode', Arial, sans-serif; font-weight: 600; font-size: 13px; flex-shrink: 0; }
+  .avatar.naam { background: var(--blauw); color: #0C447C; }
+  .avatar.anon { background: var(--grijs); color: #888; }
+  .deelnemer-naam { flex: 1; font-weight: 700; font-size: 14px; }
+  .deelnemer-tijd { font-size: 12px; color: var(--tekst-licht); font-weight: 600; }
+  .deelnemers-lijst { max-height: 280px; overflow-y: auto; margin-bottom: 22px; }
+  .veld { margin-bottom: 15px; }
+  .veld label { display: block; font-size: 13px; font-weight: 800; color: var(--zwart); margin-bottom: 6px; }
+  .veld input[type="text"], .veld input[type="email"] { width: 100%; padding: 12px 15px; border: 2px solid var(--grijs-rand); border-radius: 14px; font-family: 'Nunito', sans-serif; font-size: 15px; font-weight: 600; background: var(--grijs); color: var(--zwart); transition: border-color 0.2s, background 0.2s; }
+  .veld input:focus { outline: none; border-color: var(--magenta); background: var(--wit); }
+  .checkbox-rij { display: flex; align-items: flex-start; gap: 10px; padding: 11px 14px; background: var(--grijs); border-radius: 14px; cursor: pointer; transition: background 0.2s; margin-bottom: 11px; }
+  .checkbox-rij:hover { background: var(--blauw-licht); }
+  .checkbox-rij input { width: 20px; height: 20px; accent-color: var(--magenta); cursor: pointer; margin-top: 1px; flex-shrink: 0; }
+  .checkbox-rij span { font-size: 13px; font-weight: 600; color: var(--tekst); line-height: 1.4; }
+  .verstuur-knop { width: 100%; background: var(--magenta); color: var(--wit); border: none; border-radius: 18px; padding: 15px; font-family: 'Tomarik', 'Trebuchet MS', 'Lucida Sans Unicode', Arial, sans-serif; font-size: 20px; font-weight: 600; cursor: pointer; box-shadow: 0 6px 0 var(--magenta-donker); transition: transform 0.12s, box-shadow 0.12s; margin-top: 6px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+  .verstuur-knop:hover { transform: translateY(-2px); box-shadow: 0 8px 0 var(--magenta-donker); }
+  .verstuur-knop:active { transform: translateY(3px); box-shadow: 0 3px 0 var(--magenta-donker); }
+  .succes-blok { background: var(--geel); border-radius: 18px; padding: 24px; text-align: center; animation: pop 0.4s ease; }
+  @keyframes pop { 0%{transform:scale(0.9);opacity:0;} 100%{transform:scale(1);opacity:1;} }
+  .succes-blok h4 { font-family: 'Tomarik', 'Trebuchet MS', 'Lucida Sans Unicode', Arial, sans-serif; font-size: 24px; margin-bottom: 8px; }
+  .succes-blok p { font-size: 14px; font-weight: 600; color: #333; }
+
+  .stats-balk { margin-top: 24px; }
+  .stats-inner { max-width: 700px; margin: 0 auto; display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; }
+  .stat-kaart { position: relative; border-radius: 24px; padding: 28px 22px; text-align: center; border: 3px solid var(--zwart); overflow: hidden; transition: transform 0.18s; }
+  .stat-kaart:hover { transform: translateY(-4px); }
+  .stat-kaart.blauw { background: var(--blauw); box-shadow: 6px 6px 0 #000; }
+  .stat-kaart.geel { background: var(--geel); box-shadow: 6px 6px 0 #000; }
+  .stat-kaart::after { content: ''; position: absolute; width: 120px; height: 120px; border-radius: 50%; background: rgba(255,255,255,0.25); top: -50px; right: -40px; }
+  .stat-icoon { width: 60px; height: 60px; border-radius: 50%; background: var(--wit); border: 3px solid var(--zwart); display: flex; align-items: center; justify-content: center; font-size: 30px; margin: 0 auto 14px; position: relative; z-index: 2; box-shadow: 0 3px 0 var(--zwart); }
+  .stat-getal { font-family: 'Tomarik', 'Trebuchet MS', 'Lucida Sans Unicode', Arial, sans-serif; font-size: 56px; font-weight: 700; line-height: 1; position: relative; z-index: 2; }
+  .stat-kaart.blauw .stat-getal { color: var(--magenta); }
+  .stat-kaart.geel .stat-getal { color: var(--zwart); }
+  .stat-label { font-size: 15px; font-weight: 700; margin-top: 6px; position: relative; z-index: 2; }
+  .stat-kaart.blauw .stat-label { color: var(--zwart); }
+  .stat-kaart.geel .stat-label { color: var(--zwart); }
+  @media (max-width: 640px) { .stats-inner { grid-template-columns: 1fr; gap: 16px; } .stat-kaart { box-shadow: 4px 4px 0 #000 !important; } }
+
+  .gemeente-strip { background: var(--zwart); color: var(--wit); padding: 48px 24px; text-align: center; }
+  .gemeente-strip-inner { max-width: 640px; margin: 0 auto; }
+  .gemeente-strip h2 { font-size: clamp(26px, 4vw, 36px); margin-bottom: 14px; color: var(--wit); }
+  .gemeente-strip p { font-size: 17px; color: #C8C8C8; font-weight: 600; margin-bottom: 26px; }
+  .gemeente-btn {
+    display: inline-flex; align-items: center; gap: 10px;
+    background: #d4f04c; color: #000;
+    font-family: 'Tomarik', 'Trebuchet MS', 'Lucida Sans Unicode', Arial, sans-serif;
+    font-size: 24px; font-weight: 800; padding: 14px 32px; border-radius: 16px;
+    text-decoration: none; box-shadow: 6px 6px 0 #000; transition: transform 0.15s;
+  }
+  .gemeente-btn:hover { transform: translateY(-2px); }
+
+  footer { background: var(--blauw); padding: 36px 24px; text-align: center; color: var(--zwart); font-weight: 600; font-size: 14px; }
+  footer a { color: var(--magenta-donker); font-weight: 700; }
+  .footer-logo { font-family: 'Tomarik', 'Trebuchet MS', 'Lucida Sans Unicode', Arial, sans-serif; font-size: 22px; font-weight: 700; margin-bottom: 10px; }
+  .leaflet-popup-content-wrapper { border-radius: 16px; }
+  .leaflet-popup-content { font-family: 'Nunito', sans-serif; font-weight: 600; }
+  @media (max-width: 600px) {
+    #kaart { height: 70vh; }
+    .paneel { width: 100%; }
+    .plaats-knop { padding: 8px 16px; font-size: 14px; gap: 6px; }
+    .kaart-hint { max-width: calc(100% - 24px); width: calc(100% - 24px); left: 12px; right: 12px; transform: none; }
+  }
+  @media screen and (max-width: 768px) { .btn-header { display: none; } }
+</style>
+</head>
+<body>
+  <header>
+    <div class="logo"><a href="/"><img src="/images/logo.svg" alt="{{APP_NAME}} Logo"></a></div>
+    <div class="header-right">
+      <nav class="main-nav">
+        <a href="#how">Hoe werkt het?</a>
+        <a href="#nieuws">In het nieuws</a>
+      </nav>
+      <a class="btn btn-header" href="/wij-willen-een-spelbel">Wij willen een Spelbel!</a>
+    </div>
+  </header>
+
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-badge"><span class="puls"></span> Doe mee in jouw buurt</div>
+    <h1>Wij willen een <span class="magenta">Spelbel!</span></h1>
+    <p>Zoek jouw speelplek op de kaart en meld je aan. Zie wie er nog meer een Spelbel wil in de buurt. Hoe meer aanmeldingen, hoe groter de kans dat we samen met de gemeente een Spelbel kunnen regelen. Deel het dus met je buren!</p>
+  </div>
+</section>
+
+<div class="kaart-sectie" id="aanmelden">
+  <div class="kaart-card">
+    <div class="kaart-header">
+      <h3> Meld je speelplek aan op de kaart</h3>
+      <div class="kaart-header-rechts">
+        <div class="kaart-zoek-wrap">
+          <div class="kaart-zoek">
+            <span>🔍</span>
+            <input type="text" id="zoek" placeholder="Zoek op plaats of wijk..." autocomplete="off">
+          </div>
+          <div class="zoek-resultaten" id="zoek-resultaten"></div>
+        </div>
+      </div>
+    </div>
+    <div class="kaart-wrap">
+      <div id="kaart"></div>
+      <button class="plaats-knop" id="plaats-knop" onclick="togglePlaatsen()">
+        <span id="plaats-knop-icon" style="color:#fff;font-weight:800;">+</span>
+        <span id="plaats-knop-tekst">Nieuwe speelplek plaatsen</span>
+      </button>
+      <div class="kaart-hint" id="kaart-hint">
+        <span>👆 Klik op een stip om aan te melden, of plaats een nieuwe speelplek</span>
+        <button class="sluit-hint" onclick="document.getElementById('kaart-hint').style.display='none'">✕</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="stats-balk">
+    <div class="stats-inner">
+      <div class="stat-kaart blauw">
+        <div class="stat-icoon">🙋</div>
+        <div class="stat-getal" id="stat-totaal">0</div>
+        <div class="stat-label">buurtbewoners aangemeld</div>
+      </div>
+      <div class="stat-kaart geel">
+        <div class="stat-icoon">🛝</div>
+        <div class="stat-getal" id="stat-speeltuinen">0</div>
+        <div class="stat-label">speelplekken op de kaart</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section class="gemeente-strip">
+  <div class="gemeente-strip-inner">
+    <h2>Werk je bij een gemeente?</h2>
+    <p>Zie precies waar in jouw gemeente vraag is naar een Spel Bel. We gaan graag met je in gesprek over een pilot.</p>
+    <a href="mailto:info@scrollscrollscroll.nl" class="gemeente-btn">✉️ Neem contact op</a>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-logo">🔔 Spel Bel</div>
+  <p>Spel Bel is een initiatief van <a href="https://www.scrollscrollscroll.nl" target="_blank">ScrollScrollScroll</a>, ontwerpstudio uit Rotterdam.<br>
+  <a href="mailto:info@scrollscrollscroll.nl">info@scrollscrollscroll.nl</a> &middot; <a href="/">www.spelbel.nl</a></p>
+</footer>
+
+<div class="paneel-overlay" id="paneel-overlay" onclick="if(event.target===this)sluitPaneel()">
+  <div class="paneel" id="paneel">
+    <div class="paneel-kop">
+      <button class="paneel-sluit" onclick="sluitPaneel()">✕</button>
+      <h3 id="paneel-titel">Speelplek</h3>
+      <div class="paneel-plaats" id="paneel-plaats"></div>
+    </div>
+    <div class="paneel-body" id="paneel-body"></div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+const CLUSTER_AFSTAND = 0.003;
+let kaart, prikMarker = null, plaatsModus = false;
+let speeltuinen = [], actievePlek = null, nieuweCoord = null;
+const markers = {};
+
+async function laad() {
+  try {
+    const resp = await fetch('/api/locations');
+    speeltuinen = resp.ok ? await resp.json() : [];
+  } catch (e) {
+    speeltuinen = [];
+  }
+}
+function initialen(naam) { if (naam === 'Anoniem') return '?'; return naam.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase(); }
+function tijdGeleden(t) { const s=Math.floor((Date.now()-t)/1000); if(s<60)return 'zojuist'; if(s<3600)return Math.floor(s/60)+' min'; if(s<86400)return Math.floor(s/3600)+' uur'; return Math.floor(s/86400)+' d'; }
+function markerGrootte(n) { return Math.min(34 + n*1.6, 64); }
+
+function initKaart() {
+  kaart = L.map('kaart', { scrollWheelZoom: true, zoomControl: true }).setView([51.9, 4.9], 8);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { attribution: '© OpenStreetMap © CARTO', maxZoom: 19 }).addTo(kaart);
+  kaart.on('click', e => { if (!plaatsModus) return; kiesNieuweLocatie(e.latlng.lat, e.latlng.lng); });
+}
+
+function toonBevestigingsToast(ok) {
+  const hint = document.getElementById('kaart-hint');
+  hint.style.display = 'flex';
+  hint.classList.toggle('plaatsen', false);
+  hint.style.background = ok ? '#1A8B54' : '#C00A5E';
+  hint.querySelector('span').textContent = ok
+    ? '✅ Je aanmelding is bevestigd! Bedankt.'
+    : '❌ Deze bevestigingslink is niet (meer) geldig.';
+  setTimeout(() => { hint.style.display = 'none'; hint.style.background = ''; }, 5000);
+}
+function tekenMarkers() {
+  Object.values(markers).forEach(m => kaart.removeLayer(m));
+  speeltuinen.forEach(st => {
+    const n = st.mensen.length, grootte = markerGrootte(n);
+    const icon = L.divIcon({ className:'', html:`<div class="speeltuin-marker" style="width:${grootte}px;height:${grootte}px;font-size:${Math.max(13,grootte*0.34)}px;">${n}</div>`, iconSize:[grootte,grootte], iconAnchor:[grootte/2,grootte/2] });
+    const m = L.marker([st.lat, st.lng], { icon }).addTo(kaart);
+    m.on('click', (e) => { if (plaatsModus) return; L.DomEvent.stopPropagation(e); openDetail(st.id); });
+    markers[st.id] = m;
+  });
+}
+function updateStats() {
+  const totaal = speeltuinen.reduce((s,st)=>s+st.mensen.length,0);
+  document.getElementById('stat-totaal').textContent = totaal;
+  document.getElementById('stat-speeltuinen').textContent = speeltuinen.length;
+}
+function vindCluster(lat, lng) { return speeltuinen.find(st => Math.abs(st.lat-lat)<CLUSTER_AFSTAND && Math.abs(st.lng-lng)<CLUSTER_AFSTAND); }
+
+function togglePlaatsen() { plaatsModus ? stopPlaatsen() : startPlaatsen(); }
+function startPlaatsen() {
+  plaatsModus = true;
+  document.getElementById('kaart').classList.add('plaatsmodus');
+  document.querySelector('.kaart-wrap').classList.add('plaatsmodus-actief');
+  document.getElementById('plaats-knop').classList.add('actief');
+  document.getElementById('plaats-knop-icon').textContent = '✕';
+  document.getElementById('plaats-knop-tekst').textContent = 'Annuleren';
+  const hint = document.getElementById('kaart-hint');
+  hint.style.display = 'flex';
+  hint.classList.add('plaatsen');
+  hint.querySelector('span').textContent = '➕ Klik op de plek waar jij een Spel Bel wil!';
+  document.getElementById('kaart').scrollIntoView({ behavior:'smooth', block:'center' });
+}
+function stopPlaatsen() {
+  plaatsModus = false;
+  document.getElementById('kaart').classList.remove('plaatsmodus');
+  document.querySelector('.kaart-wrap').classList.remove('plaatsmodus-actief');
+  document.getElementById('plaats-knop').classList.remove('actief');
+  document.getElementById('plaats-knop-icon').textContent = '+';
+  document.getElementById('plaats-knop-tekst').textContent = 'Nieuwe speelplek plaatsen';
+  const hint = document.getElementById('kaart-hint');
+  hint.classList.remove('plaatsen');
+}
+function kiesNieuweLocatie(lat, lng) {
+  const bestaand = vindCluster(lat, lng);
+  if (bestaand) { stopPlaatsen(); openDetail(bestaand.id); return; }
+  nieuweCoord = { lat, lng };
+  if (prikMarker) kaart.removeLayer(prikMarker);
+  prikMarker = L.marker([lat,lng], { icon: L.divIcon({ className:'', html:`<div style="width:28px;height:28px;border-radius:50% 50% 50% 0;background:#EC0E73;border:3px solid #1A1A1A;transform:rotate(-45deg);box-shadow:0 3px 0 rgba(0,0,0,0.3);"></div>`, iconSize:[28,28], iconAnchor:[14,28] }) }).addTo(kaart);
+  stopPlaatsen();
+  openFormulier(null, lat, lng);
+}
+
+function openDetail(id) {
+  const st = speeltuinen.find(s=>s.id==id);
+  if (!st) return;
+  actievePlek = st;
+  const n = st.mensen.length;
+  const gesorteerd = [...st.mensen].sort((a,b)=>b.tijd-a.tijd);
+  const lijst = gesorteerd.map(m=>`<div class="deelnemer-rij"><div class="avatar ${m.openbaar&&m.naam!=='Anoniem'?'naam':'anon'}">${initialen(m.naam)}</div><div class="deelnemer-naam">${m.openbaar?m.naam:'Anonieme buur'}</div><div class="deelnemer-tijd">${tijdGeleden(m.tijd)}</div></div>`).join('');
+  document.getElementById('paneel-titel').textContent = st.naam;
+  document.getElementById('paneel-plaats').innerHTML = st.plaats ? `📍 ${st.plaats}` : '';
+  document.getElementById('paneel-body').innerHTML = `
+    <div class="paneel-teller"><div class="paneel-teller-getal">${n}</div><div class="paneel-teller-label">${n===1?'buur wil':'buren willen'} hier een Spel Bel</div></div>
+    <div class="deelnemers-titel">Wie doen er mee?</div>
+    <div class="deelnemers-lijst">${lijst}</div>
+    <button class="verstuur-knop" onclick="toonFormulierVoorBestaand('${st.id}')">🔔 Ik wil hier ook een Spel Bel!</button>`;
+  openPaneel();
+}
+function toonFormulierVoorBestaand(id) { const st = speeltuinen.find(s=>s.id==id); openFormulier(st, st.lat, st.lng); }
+
+function openFormulier(bestaand, lat, lng) {
+  actievePlek = bestaand;
+  nieuweCoord = { lat, lng };
+  document.getElementById('paneel-titel').textContent = bestaand ? bestaand.naam : 'Nieuwe speelplek';
+  document.getElementById('paneel-plaats').innerHTML = bestaand && bestaand.plaats ? `📍 ${bestaand.plaats}` : '📍 Nieuwe plek op de kaart';
+  const aantalRegel = bestaand ? `<div class="paneel-teller"><div class="paneel-teller-getal">${bestaand.mensen.length}</div><div class="paneel-teller-label">${bestaand.mensen.length===1?'buur ging je voor':'buren gingen je voor'}</div></div>` : '';
+  const plekNaamVeld = bestaand ? '' : `<div class="veld"><label for="plek-naam">Naam van de speelplek</label><input type="text" id="plek-naam" placeholder="Bv. Speeltuin Douzastraat"></div>`;
+  document.getElementById('paneel-body').innerHTML = `
+    ${aantalRegel}
+    <div class="veld"><label for="naam">Jouw naam</label><input type="text" id="naam" placeholder="Bv. Sanne de Boer" autocomplete="name"></div>
+    <div class="veld"><label for="email">E-mailadres</label><input type="email" id="email" placeholder="sanne@voorbeeld.nl" autocomplete="email"></div>
+    ${plekNaamVeld}
+    <label class="checkbox-rij"><input type="checkbox" id="openbaar" checked><span>Mijn naam mag zichtbaar zijn bij deze speelplek (anders blijf je anoniem)</span></label>
+    <label class="checkbox-rij"><input type="checkbox" id="nieuwsbrief" checked><span>Houd mij op de hoogte van het Spel Bel-avontuur</span></label>
+    <button class="verstuur-knop" onclick="aanmelden()">🔔 Ik wil een Spel Bel!</button>`;
+  openPaneel();
+}
+
+async function aanmelden() {
+  const naam = document.getElementById('naam').value.trim();
+  const email = document.getElementById('email').value.trim();
+  const openbaar = document.getElementById('openbaar').checked;
+  const nieuwsbrief = document.getElementById('nieuwsbrief').checked;
+  const plekNaamEl = document.getElementById('plek-naam');
+  if (!naam) { alert('Vul even je naam in 🙂'); return; }
+  if (!email || !email.includes('@')) { alert('Vul een geldig e-mailadres in.'); return; }
+  if (plekNaamEl && !plekNaamEl.value.trim()) { alert('Geef de speelplek even een naam 🛝'); plekNaamEl.focus(); return; }
+
+  const plek = actievePlek;
+  const lat = plek ? plek.lat : nieuweCoord.lat;
+  const lng = plek ? plek.lng : nieuweCoord.lng;
+  const plekNaam = plekNaamEl ? plekNaamEl.value.trim() : (plek ? plek.naam : '');
+
+  const knop = document.querySelector('#paneel-body .verstuur-knop');
+  if (knop) { knop.disabled = true; knop.textContent = 'Bezig...'; }
+
+  try {
+    const resp = await fetch('/api/signups', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        naam, email, lat, lng,
+        locationId: plek ? plek.id : null,
+        plekNaam, openbaar, nieuwsbrief,
+      }),
+    });
+    const data = await resp.json();
+    if (!resp.ok) throw new Error(data.error || 'Er ging iets mis.');
+
+    if (prikMarker) { kaart.removeLayer(prikMarker); prikMarker = null; }
+    document.getElementById('paneel-body').innerHTML = `
+      <div class="succes-blok"><h4>📬 Check je inbox!</h4><p>We hebben een bevestigingsmail gestuurd naar <strong>${email}</strong>. Klik op de link in die mail om je aanmelding voor ${plekNaam} te bevestigen.</p></div>
+      <button class="verstuur-knop" style="margin-top:18px;" onclick="sluitPaneel()">Terug naar de kaart</button>`;
+  } catch (err) {
+    if (knop) { knop.disabled = false; knop.textContent = '🔔 Ik wil een Spel Bel!'; }
+    alert(err.message);
+  }
+}
+
+function openPaneel() { document.getElementById('paneel').classList.add('open'); document.getElementById('paneel-overlay').classList.add('open'); }
+function sluitPaneel() {
+  document.getElementById('paneel').classList.remove('open');
+  document.getElementById('paneel-overlay').classList.remove('open');
+  if (prikMarker) { kaart.removeLayer(prikMarker); prikMarker = null; }
+  actievePlek = null; nieuweCoord = null;
+}
+
+let zoekTimer = null;
+const zoekInput = document.getElementById('zoek');
+const zoekResultatenEl = document.getElementById('zoek-resultaten');
+
+zoekInput.addEventListener('input', e => {
+  const q = e.target.value.trim();
+  clearTimeout(zoekTimer);
+  if (q.length < 2) { zoekResultatenEl.classList.remove('open'); return; }
+  zoekTimer = setTimeout(() => zoekUitvoeren(q), 350);
+});
+
+zoekInput.addEventListener('focus', () => {
+  if (zoekResultatenEl.children.length > 0 && zoekInput.value.trim().length >= 2) {
+    zoekResultatenEl.classList.add('open');
+  }
+});
+
+document.addEventListener('click', e => {
+  if (!e.target.closest('.kaart-zoek-wrap')) zoekResultatenEl.classList.remove('open');
+});
+
+async function zoekUitvoeren(q) {
+  const ql = q.toLowerCase();
+  const eigen = speeltuinen
+    .filter(st => (st.naam + ' ' + st.plaats).toLowerCase().includes(ql))
+    .slice(0, 4)
+    .map(st => ({ type:'speeltuin', naam: st.naam, sub: st.plaats || 'Speelplek', lat: st.lat, lng: st.lng, id: st.id }));
+
+  zoekResultatenEl.innerHTML = `<div class="zoek-leeg">🔍 Zoeken...</div>`;
+  zoekResultatenEl.classList.add('open');
+
+  let plaatsen = [];
+  try {
+    const url = `https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&limit=5&countrycodes=nl,be&q=${encodeURIComponent(q)}`;
+    const resp = await fetch(url, { headers: { 'Accept-Language': 'nl' } });
+    const data = await resp.json();
+    plaatsen = data.map(p => ({
+      type: 'plaats',
+      naam: p.display_name.split(',')[0],
+      sub: p.display_name.split(',').slice(1, 3).join(',').trim(),
+      lat: parseFloat(p.lat),
+      lng: parseFloat(p.lon),
+    }));
+  } catch (err) {
+    plaatsen = [];
+  }
+
+  toonZoekResultaten(eigen, plaatsen);
+}
+
+function toonZoekResultaten(eigen, plaatsen) {
+  let html = '';
+  eigen.forEach(r => {
+    html += `<div class="zoek-item" onclick="gaNaarResultaat(${r.lat},${r.lng},'speeltuin','${r.id}')">🔔 <div><div>${r.naam}</div><div class="plaats-sub">${r.sub}</div></div></div>`;
+  });
+  plaatsen.forEach(r => {
+    html += `<div class="zoek-item" onclick="gaNaarResultaat(${r.lat},${r.lng},'plaats','')">📍 <div><div>${r.naam}</div><div class="plaats-sub">${r.sub}</div></div></div>`;
+  });
+  if (!html) html = `<div class="zoek-leeg">Niets gevonden. Probeer een andere zoekterm.</div>`;
+  zoekResultatenEl.innerHTML = html;
+  zoekResultatenEl.classList.add('open');
+}
+
+function gaNaarResultaat(lat, lng, type, id) {
+  zoekResultatenEl.classList.remove('open');
+  zoekInput.value = '';
+  const zoom = type === 'speeltuin' ? 15 : 14;
+  kaart.flyTo([lat, lng], zoom, { duration: 1.2 });
+  if (type === 'speeltuin' && id) {
+    setTimeout(() => openDetail(id), 1300);
+  }
+}
+document.addEventListener('keydown', e=>{ if(e.key==='Escape'){ sluitPaneel(); stopPlaatsen(); } });
+
+document.addEventListener('DOMContentLoaded', async () => {
+  initKaart();
+  await laad();
+  tekenMarkers();
+  updateStats();
+
+  const params = new URLSearchParams(window.location.search);
+  if (params.has('bevestigd')) {
+    toonBevestigingsToast(params.get('bevestigd') === '1');
+    const locatieId = params.get('locatie');
+    if (locatieId) {
+      const plek = speeltuinen.find(s => s.id == locatieId);
+      if (plek) setTimeout(() => kaart.flyTo([plek.lat, plek.lng], 14, { duration: 1.2 }), 600);
+    }
+    window.history.replaceState({}, '', '/wij-willen-een-spelbel');
+  }
+});
+</script>
+</body>
+</html>

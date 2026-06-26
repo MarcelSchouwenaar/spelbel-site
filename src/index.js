@@ -1,15 +1,22 @@
 require('dotenv').config();
+const crypto = require('crypto');
 const express = require('express');
 const fetch = require('node-fetch');
 const path = require('path');
 const { render } = require('./lib/render');
+const { pool, init: initDb } = require('./lib/db');
+const { sendVerificationEmail } = require('./lib/email');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
 const APP_URL = (process.env.APP_URL || '').replace(/\/$/, '');
 const APP_NAME = process.env.APP_NAME || 'Spelbel';
+const CLUSTER_AFSTAND = 0.003;
 
+app.use(express.json());
 app.use(express.static(path.join(__dirname, '..', 'public')));
+
+initDb().catch(err => console.error('[DB] init failed:', err.message));
 
 // Homepage
 app.get('/', (req, res) => {
@@ -19,6 +26,11 @@ app.get('/', (req, res) => {
         CONTACT_EMAIL_USER:   emailUser,
         CONTACT_EMAIL_DOMAIN: emailDomain,
     }));
+});
+
+// Wij willen een Spelbel (signup map page)
+app.get('/wij-willen-een-spelbel', (req, res) => {
+    res.send(render('wij-willen-een-spelbel.html', { APP_NAME }));
 });
 
 // Thank you page
@@ -140,6 +152,113 @@ function buildPushSection(doorbellId, vapidKey, appUrl) {
 })();
 </script>`;
 }
+
+// Wij willen een Spelbel — list locations with verified signups
+app.get('/api/locations', async (req, res) => {
+    try {
+        const { rows: locations } = await pool.query('SELECT id, naam, plaats, lat, lng FROM locations ORDER BY id');
+        const { rows: signups } = await pool.query(
+            `SELECT location_id, naam, openbaar, verified_at AS tijd
+             FROM signups WHERE verified_at IS NOT NULL ORDER BY verified_at DESC`
+        );
+        const byLocation = {};
+        signups.forEach(s => {
+            if (!byLocation[s.location_id]) byLocation[s.location_id] = [];
+            byLocation[s.location_id].push({
+                naam: s.openbaar ? s.naam : 'Anoniem',
+                openbaar: s.openbaar,
+                tijd: new Date(s.tijd).getTime(),
+            });
+        });
+        const result = locations
+            .map(loc => ({ ...loc, mensen: byLocation[loc.id] || [] }))
+            .filter(loc => loc.mensen.length > 0);
+        res.json(result);
+    } catch (err) {
+        console.error('[API] /api/locations error:', err.message);
+        res.status(500).json({ error: 'Kon locaties niet laden.' });
+    }
+});
+
+// Wij willen een Spelbel — new signup, triggers verification email
+app.post('/api/signups', async (req, res) => {
+    try {
+        const { naam, email, lat, lng, locationId, plekNaam, openbaar, nieuwsbrief } = req.body || {};
+        if (!naam || !email || !email.includes('@')) {
+            return res.status(400).json({ error: 'Vul een naam en geldig e-mailadres in.' });
+        }
+        if (typeof lat !== 'number' || typeof lng !== 'number') {
+            return res.status(400).json({ error: 'Kies eerst een locatie op de kaart.' });
+        }
+
+        let location;
+        if (locationId) {
+            const { rows } = await pool.query('SELECT * FROM locations WHERE id = $1', [locationId]);
+            location = rows[0];
+        }
+        if (!location) {
+            const { rows } = await pool.query(
+                `SELECT * FROM locations WHERE ABS(lat - $1) < $3 AND ABS(lng - $2) < $3 LIMIT 1`,
+                [lat, lng, CLUSTER_AFSTAND]
+            );
+            location = rows[0];
+        }
+        if (!location) {
+            const { rows } = await pool.query(
+                'INSERT INTO locations (naam, plaats, lat, lng) VALUES ($1, $2, $3, $4) RETURNING *',
+                [plekNaam || 'Nieuwe speelplek', '', lat, lng]
+            );
+            location = rows[0];
+        }
+
+        const existing = await pool.query(
+            'SELECT * FROM signups WHERE location_id = $1 AND email = $2',
+            [location.id, email]
+        );
+        if (existing.rows[0] && existing.rows[0].verified_at) {
+            return res.status(409).json({ error: 'Dit e-mailadres is al bevestigd voor deze speelplek.' });
+        }
+
+        const verifyToken = crypto.randomBytes(24).toString('hex');
+        if (existing.rows[0]) {
+            await pool.query(
+                'UPDATE signups SET naam = $1, openbaar = $2, nieuwsbrief = $3, verify_token = $4 WHERE id = $5',
+                [naam, openbaar !== false, nieuwsbrief !== false, verifyToken, existing.rows[0].id]
+            );
+        } else {
+            await pool.query(
+                `INSERT INTO signups (location_id, naam, email, openbaar, nieuwsbrief, verify_token)
+                 VALUES ($1, $2, $3, $4, $5, $6)`,
+                [location.id, naam, email, openbaar !== false, nieuwsbrief !== false, verifyToken]
+            );
+        }
+
+        const verifyUrl = `${req.protocol}://${req.get('host')}/api/verify/${verifyToken}`;
+        await sendVerificationEmail({ to: email, naam, plekNaam: location.naam, verifyUrl });
+
+        res.json({ pending: true, locationId: location.id });
+    } catch (err) {
+        console.error('[API] /api/signups error:', err.message);
+        res.status(500).json({ error: 'Aanmelden is niet gelukt. Probeer het later opnieuw.' });
+    }
+});
+
+// Wij willen een Spelbel — email verification link
+app.get('/api/verify/:token', async (req, res) => {
+    try {
+        const { rows } = await pool.query(
+            'UPDATE signups SET verified_at = now() WHERE verify_token = $1 AND verified_at IS NULL RETURNING location_id',
+            [req.params.token]
+        );
+        if (rows[0]) {
+            return res.redirect(`/wij-willen-een-spelbel?bevestigd=1&locatie=${rows[0].location_id}`);
+        }
+        res.redirect('/wij-willen-een-spelbel?bevestigd=0');
+    } catch (err) {
+        console.error('[API] /api/verify error:', err.message);
+        res.redirect('/wij-willen-een-spelbel?bevestigd=0');
+    }
+});
 
 // Health check
 app.get('/health', (req, res) => res.json({ status: 'ok', uptime: Math.floor(process.uptime()) }));
