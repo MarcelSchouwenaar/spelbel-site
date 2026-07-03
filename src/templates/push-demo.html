@@ -18,11 +18,12 @@
     .err { background: #fff5f5; border: 1px solid #feb2b2; color: #c53030; }
     .info{ background: #ebf8ff; border: 1px solid #90cdf4; color: #2b6cb0; }
   </style>
+  <link rel="icon" type="image/svg+xml" href="/images/app-icon-v1.svg">
 </head>
 <body>
   <div><img src="/images/logo.svg" alt="{{APP_NAME}}" style="height:48px;margin-bottom:20px"></div>
   <h1>Push notificaties</h1>
-  <p>Ontvang een melding op dit apparaat wanneer een Spelbel overgaat — zonder WhatsApp of Telegram.</p>
+  <p>Ontvang een melding op dit apparaat wanneer een SpelBel overgaat — zonder WhatsApp of Telegram.</p>
 
   <button class="btn" id="btn-subscribe">🔔 Meldingen inschakelen</button>
   <button class="btn btn-secondary" id="btn-test" disabled>📤 Testmelding versturen</button>
@@ -85,7 +86,7 @@
         btnSubscribe.style.display = 'none';
         btnUnsubscribe.style.display = '';
         btnTest.disabled = false;
-        showStatus('✅ Gelukt! Je ontvangt nu een melding wanneer een Spelbel overgaat.', 'ok');
+        showStatus('✅ Gelukt! Je ontvangt nu een melding wanneer een SpelBel overgaat.', 'ok');
       } catch (err) {
         btnSubscribe.disabled = false;
         btnSubscribe.textContent = '🔔 Meldingen inschakelen';

@@ -23,7 +23,7 @@
 
   header { background: #fff; }
 
-  .hero { background: var(--blauw); padding: 44px 24px 36px; margin: 0; text-align: center; position: relative; overflow: hidden; }
+  .hero { background: var(--blauw); padding: 44px 24px 36px; margin: 0; text-align: center; position: relative; overflow: hidden; min-height: 24vh; }
   .hero::before, .hero::after { content: '🔔'; position: absolute; font-size: 110px; opacity: 0.08; pointer-events: none; }
   .hero::before { top: 10px; left: -20px; transform: rotate(-20deg); }
   .hero::after { bottom: -20px; right: -10px; transform: rotate(15deg); }
@@ -150,9 +150,11 @@
     .paneel { width: 100%; }
     .plaats-knop { padding: 8px 16px; font-size: 14px; gap: 6px; }
     .kaart-hint { max-width: calc(100% - 24px); width: calc(100% - 24px); left: 12px; right: 12px; transform: none; }
+    .kaart-hint.plaatsen { bottom: auto; top: 68px; left: 12px; right: 12px; transform: none; }
   }
   @media screen and (max-width: 768px) { .btn-header { display: none; } }
 </style>
+  <link rel="icon" type="image/svg+xml" href="/images/app-icon-v1.svg">
 </head>
 <body>
   <header>
@@ -162,15 +164,15 @@
         <a href="#how">Hoe werkt het?</a>
         <a href="#nieuws">In het nieuws</a>
       </nav>
-      <a class="btn btn-header" href="/wij-willen-een-spelbel">Wij willen een Spelbel!</a>
+      <a class="btn btn-header" href="/wij-willen-een-spelbel">Wij willen een SpelBel!</a>
     </div>
   </header>
 
 <section class="hero">
   <div class="hero-inner">
     <div class="hero-badge"><span class="puls"></span> Doe mee in jouw buurt</div>
-    <h1>Wij willen een <span class="magenta">Spelbel!</span></h1>
-    <p>Zoek jouw speelplek op de kaart en meld je aan. Zie wie er nog meer een Spelbel wil in de buurt. Hoe meer aanmeldingen, hoe groter de kans dat we samen met de gemeente een Spelbel kunnen regelen. Deel het dus met je buren!</p>
+    <h1>Wij willen een <span class="magenta">SpelBel!</span></h1>
+    <p>Zoek jouw speelplek op de kaart en meld je aan. Zie wie er nog meer een SpelBel wil in de buurt. Hoe meer aanmeldingen, hoe groter de kans dat we samen met de gemeente een SpelBel kunnen regelen. Deel het dus met je buren!</p>
   </div>
 </section>
 
@@ -306,7 +308,8 @@ function startPlaatsen() {
   hint.style.display = 'flex';
   hint.classList.add('plaatsen');
   hint.querySelector('span').textContent = '➕ Klik op de plek waar jij een Spel Bel wil!';
-  document.getElementById('kaart').scrollIntoView({ behavior:'smooth', block:'center' });
+  const block = window.innerWidth <= 600 ? 'start' : 'center';
+  document.getElementById('kaart').scrollIntoView({ behavior:'smooth', block });
 }
 function stopPlaatsen() {
   plaatsModus = false;

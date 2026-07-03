@@ -10,7 +10,7 @@ const { sendVerificationEmail } = require('./lib/email');
 const app = express();
 const PORT = process.env.PORT || 3001;
 const APP_URL = (process.env.APP_URL || '').replace(/\/$/, '');
-const APP_NAME = process.env.APP_NAME || 'Spelbel';
+const APP_NAME = process.env.APP_NAME || 'SpelBel';
 const CLUSTER_AFSTAND = 0.003;
 
 app.use(express.json());
@@ -28,7 +28,7 @@ app.get('/', (req, res) => {
     }));
 });
 
-// Wij willen een Spelbel (signup map page)
+// Wij willen een SpelBel (signup map page)
 app.get('/wij-willen-een-spelbel', (req, res) => {
     res.send(render('wij-willen-een-spelbel.html', { APP_NAME }));
 });
@@ -153,7 +153,7 @@ function buildPushSection(doorbellId, vapidKey, appUrl) {
 </script>`;
 }
 
-// Wij willen een Spelbel — list locations with verified signups
+// Wij willen een SpelBel — list locations with verified signups
 app.get('/api/locations', async (req, res) => {
     try {
         const { rows: locations } = await pool.query('SELECT id, naam, plaats, lat, lng FROM locations ORDER BY id');
@@ -180,7 +180,7 @@ app.get('/api/locations', async (req, res) => {
     }
 });
 
-// Wij willen een Spelbel — new signup, triggers verification email
+// Wij willen een SpelBel — new signup, triggers verification email
 app.post('/api/signups', async (req, res) => {
     try {
         const { naam, email, lat, lng, locationId, plekNaam, openbaar, nieuwsbrief } = req.body || {};
@@ -243,7 +243,7 @@ app.post('/api/signups', async (req, res) => {
     }
 });
 
-// Wij willen een Spelbel — email verification link
+// Wij willen een SpelBel — email verification link
 app.get('/api/verify/:token', async (req, res) => {
     try {
         const { rows } = await pool.query(
@@ -263,4 +263,4 @@ app.get('/api/verify/:token', async (req, res) => {
 // Health check
 app.get('/health', (req, res) => res.json({ status: 'ok', uptime: Math.floor(process.uptime()) }));
 
-app.listen(PORT, () => console.log(`[Spelbel Site] Running on port ${PORT}`));
+app.listen(PORT, () => console.log(`[SpelBel Site] Running on port ${PORT}`));

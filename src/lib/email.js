@@ -16,9 +16,9 @@ async function sendVerificationEmail({ to, naam, plekNaam, verifyUrl }) {
             'Accept': 'application/json',
         },
         body: JSON.stringify({
-            sender: { email: sender, name: 'Spelbel' },
+            sender: { email: sender, name: 'SpelBel' },
             to: [{ email: to, name: naam }],
-            subject: '🔔 Bevestig je aanmelding voor de Spelbel',
+            subject: '🔔 Bevestig je aanmelding voor de SpelBel',
             htmlContent: buildVerificationEmailHtml({ naam, plekNaam, verifyUrl }),
         }),
     });
@@ -41,14 +41,14 @@ function buildVerificationEmailHtml({ naam, plekNaam, verifyUrl }) {
         <table role="presentation" width="100%" style="max-width:480px;background:#ffffff;border-radius:24px;overflow:hidden;">
           <tr>
             <td style="background:#DD4A93;padding:28px 32px;text-align:center;">
-              <span style="font-size:24px;font-weight:bold;color:#ffffff;">🔔 Spelbel</span>
+              <span style="font-size:24px;font-weight:bold;color:#ffffff;">🔔 SpelBel</span>
             </td>
           </tr>
           <tr>
             <td style="padding:36px 32px 8px;">
               <p style="margin:0 0 16px;font-size:16px;line-height:1.6;color:#1A1A1A;">Hoi ${naam},</p>
               <p style="margin:0 0 16px;font-size:16px;line-height:1.6;color:#1A1A1A;">
-                Bedankt voor je aanmelding voor een Spelbel bij <strong>${plekNaam}</strong>! Bevestig je e-mailadres om mee te tellen op de kaart.
+                Bedankt voor je aanmelding voor een SpelBel bij <strong>${plekNaam}</strong>! Bevestig je e-mailadres om mee te tellen op de kaart.
               </p>
             </td>
           </tr>
