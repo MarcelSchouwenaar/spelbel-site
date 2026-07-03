@@ -5,7 +5,7 @@ const fetch = require('node-fetch');
 const path = require('path');
 const { render } = require('./lib/render');
 const { pool, init: initDb } = require('./lib/db');
-const { sendVerificationEmail } = require('./lib/email');
+const { sendVerificationEmail, sendOwnerNotificationEmail } = require('./lib/email');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -247,11 +247,20 @@ app.post('/api/signups', async (req, res) => {
 app.get('/api/verify/:token', async (req, res) => {
     try {
         const { rows } = await pool.query(
-            'UPDATE signups SET verified_at = now() WHERE verify_token = $1 AND verified_at IS NULL RETURNING location_id',
+            'UPDATE signups SET verified_at = now() WHERE verify_token = $1 AND verified_at IS NULL RETURNING location_id, naam, email',
             [req.params.token]
         );
         if (rows[0]) {
-            return res.redirect(`/wij-willen-een-spelbel?bevestigd=1&locatie=${rows[0].location_id}`);
+            const { location_id, naam, email } = rows[0];
+            // Send owner notification (fire-and-forget)
+            pool.query('SELECT naam FROM locations WHERE id = $1', [location_id])
+                .then(({ rows: locs }) => {
+                    const plekNaam = locs[0]?.naam || 'onbekende plek';
+                    const mapUrl = `https://www.spelbel.nl/wij-willen-een-spelbel`;
+                    sendOwnerNotificationEmail({ naam, email, plekNaam, mapUrl });
+                })
+                .catch(() => {});
+            return res.redirect(`/wij-willen-een-spelbel?bevestigd=1&locatie=${location_id}`);
         }
         res.redirect('/wij-willen-een-spelbel?bevestigd=0');
     } catch (err) {
