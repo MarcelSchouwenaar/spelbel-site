@@ -10,6 +10,10 @@ const { sendVerificationEmail, sendOwnerNotificationEmail } = require('./lib/ema
 const app = express();
 const PORT = process.env.PORT || 3001;
 const APP_URL = (process.env.APP_URL || '').replace(/\/$/, '');
+// Server-to-server calls to the main app use Railway's private network when available —
+// avoids round-tripping through the public edge, which was intermittently dropping
+// connections mid-response ("Premature close") under normal traffic.
+const INTERNAL_API_URL = (process.env.INTERNAL_API_URL || APP_URL).replace(/\/$/, '');
 const APP_NAME = process.env.APP_NAME || 'SpelBel';
 const CLUSTER_AFSTAND = 0.003;
 
@@ -58,7 +62,7 @@ app.get('/push-demo', (req, res) => {
 // Doorbell subscription page — fetches data from main app API
 app.get('/bel/:id', async (req, res) => {
     try {
-        const apiRes = await fetch(`${APP_URL}/webhook/api/public/doorbells/${req.params.id}`);
+        const apiRes = await fetch(`${INTERNAL_API_URL}/webhook/api/public/doorbells/${req.params.id}`);
         if (!apiRes.ok) {
             return res.status(404).send(render('404.html', { APP_NAME }).replace(/{{.*?}}/g, ''));
         }
@@ -85,7 +89,7 @@ app.get('/bel/:id', async (req, res) => {
             PUSH_SECTION: pushSection,
         }));
     } catch (err) {
-        console.error('[Site] /bel/:id error:', err.message);
+        console.error('[Site] /bel/:id error:', err.message, err.cause?.code || err.cause?.message || '');
         res.status(502).send('Kon deurbel niet laden. Probeer het later opnieuw.');
     }
 });
