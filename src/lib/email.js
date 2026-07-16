@@ -120,4 +120,20 @@ async function sendOwnerNotificationEmail({ naam, email, plekNaam, mapUrl }) {
     }).catch(err => console.error('[Email] owner notification failed:', err.message));
 }
 
-module.exports = { sendVerificationEmail, sendOwnerNotificationEmail };
+async function addToMailingList({ email, naam }) {
+    const apiKey = process.env.BREVO_API_KEY;
+    if (!apiKey) return;
+
+    await fetch('https://api.brevo.com/v3/contacts', {
+        method: 'POST',
+        headers: { 'api-key': apiKey, 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify({
+            email,
+            attributes: { FIRSTNAME: naam },
+            listIds: [5],
+            updateEnabled: true,
+        }),
+    }).catch(err => console.error('[Email] addToMailingList failed:', err.message));
+}
+
+module.exports = { sendVerificationEmail, sendOwnerNotificationEmail, addToMailingList };

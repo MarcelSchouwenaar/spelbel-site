@@ -5,7 +5,7 @@ const fetch = require('node-fetch');
 const path = require('path');
 const { render } = require('./lib/render');
 const { pool, init: initDb } = require('./lib/db');
-const { sendVerificationEmail, sendOwnerNotificationEmail } = require('./lib/email');
+const { sendVerificationEmail, sendOwnerNotificationEmail, addToMailingList } = require('./lib/email');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -251,11 +251,12 @@ app.post('/api/signups', async (req, res) => {
 app.get('/api/verify/:token', async (req, res) => {
     try {
         const { rows } = await pool.query(
-            'UPDATE signups SET verified_at = now() WHERE verify_token = $1 AND verified_at IS NULL RETURNING location_id, naam, email',
+            'UPDATE signups SET verified_at = now() WHERE verify_token = $1 AND verified_at IS NULL RETURNING location_id, naam, email, nieuwsbrief',
             [req.params.token]
         );
         if (rows[0]) {
-            const { location_id, naam, email } = rows[0];
+            const { location_id, naam, email, nieuwsbrief } = rows[0];
+            if (nieuwsbrief) addToMailingList({ email, naam }).catch(() => {});
             // Send owner notification (fire-and-forget)
             pool.query('SELECT naam FROM locations WHERE id = $1', [location_id])
                 .then(({ rows: locs }) => {
