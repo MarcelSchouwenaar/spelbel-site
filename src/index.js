@@ -5,7 +5,7 @@ const fetch = require('node-fetch');
 const path = require('path');
 const { render } = require('./lib/render');
 const { pool, init: initDb } = require('./lib/db');
-const { sendVerificationEmail, sendOwnerNotificationEmail, addToMailingList } = require('./lib/email');
+const { sendVerificationEmail, sendOwnerNotificationEmail, addToMailingList, sendWelcomeEmail } = require('./lib/email');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -256,7 +256,10 @@ app.get('/api/verify/:token', async (req, res) => {
         );
         if (rows[0]) {
             const { location_id, naam, email, nieuwsbrief } = rows[0];
-            if (nieuwsbrief) addToMailingList({ email, naam }).catch(() => {});
+            if (nieuwsbrief) {
+                addToMailingList({ email, naam }).catch(() => {});
+                sendWelcomeEmail({ naam, email }).catch(() => {});
+            }
             // Send owner notification (fire-and-forget)
             pool.query('SELECT naam FROM locations WHERE id = $1', [location_id])
                 .then(({ rows: locs }) => {
