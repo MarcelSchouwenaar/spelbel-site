@@ -261,11 +261,13 @@ app.get('/api/verify/:token', async (req, res) => {
                 sendWelcomeEmail({ naam, email }).catch(() => {});
             }
             // Send owner notification (fire-and-forget)
-            pool.query('SELECT naam FROM locations WHERE id = $1', [location_id])
+            pool.query('SELECT naam, plaats, lat, lng FROM locations WHERE id = $1', [location_id])
                 .then(({ rows: locs }) => {
-                    const plekNaam = locs[0]?.naam || 'onbekende plek';
+                    const loc = locs[0];
+                    const plekNaam = loc?.naam || 'onbekende plek';
+                    const mapsUrl = loc ? `https://maps.google.com/maps?q=${loc.lat},${loc.lng}` : null;
                     const mapUrl = `https://www.spelbel.nl/wij-willen-een-spelbel`;
-                    sendOwnerNotificationEmail({ naam, email, plekNaam, mapUrl });
+                    sendOwnerNotificationEmail({ naam, email, plekNaam, plaats: loc?.plaats, mapsUrl, mapUrl });
                 })
                 .catch(() => {});
             return res.redirect(`/wij-willen-een-spelbel?bevestigd=1&locatie=${location_id}`);
