@@ -129,7 +129,7 @@ async function addToMailingList({ email, naam }) {
         headers: { 'api-key': apiKey, 'Content-Type': 'application/json', 'Accept': 'application/json' },
         body: JSON.stringify({
             email,
-            attributes: { FIRSTNAME: naam },
+            attributes: { FIRSTNAME: naam, BRON: 'kaart_geverifieerd' },
             listIds: [5],
             updateEnabled: true,
         }),
