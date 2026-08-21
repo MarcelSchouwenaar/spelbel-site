@@ -18,6 +18,33 @@ const APP_NAME = process.env.APP_NAME || 'SpelBel';
 const CLUSTER_AFSTAND = 0.003;
 
 app.use(express.json());
+
+// ── Staging ──────────────────────────────────────────────
+// Never index staging, and make it obvious which environment a page came from.
+const IS_STAGING = process.env.STAGING === 'true';
+if (IS_STAGING) {
+    app.use((_req, res, next) => {
+        res.set('X-Robots-Tag', 'noindex, nofollow');
+        next();
+    });
+    app.get('/robots.txt', (_req, res) => res.type('text/plain').send('User-agent: *\nDisallow: /\n'));
+
+    // Inject an amber bar into every HTML response, mirroring the main app's staging banner.
+    const BANNER = '<div style="position:sticky;top:0;z-index:9999;background:#F6AD55;color:#1A1A1A;'
+        + 'font:600 14px/1.4 -apple-system,BlinkMacSystemFont,sans-serif;padding:8px 16px;text-align:center">'
+        + '\u26A0\uFE0F STAGING \u2014 testomgeving, geen echte meldingen</div>';
+    app.use((_req, res, next) => {
+        const send = res.send.bind(res);
+        res.send = (body) => {
+            if (typeof body === 'string' && body.includes('<body')) {
+                body = body.replace(/(<body[^>]*>)/i, `$1${BANNER}`);
+            }
+            return send(body);
+        };
+        next();
+    });
+}
+
 app.use(express.static(path.join(__dirname, '..', 'public')));
 
 initDb().catch(err => console.error('[DB] init failed:', err.message));
