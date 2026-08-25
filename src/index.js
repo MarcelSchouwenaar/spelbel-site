@@ -75,9 +75,45 @@ app.get('/privacy', (req, res) => {
 });
 
 // Push settings
-app.get('/push/settings', (req, res) => {
-    res.send(render('push-settings.html', { APP_NAME, APP_URL }));
+// Per-bell manifest. iOS gives an installed web app its own storage jar, so anything the
+// bell page put in localStorage is invisible once the app is on the home screen — which is
+// exactly the moment we need to know which bell the parent came for. Baking the bell into
+// start_url is the one channel that survives installation.
+app.get('/manifest.webmanifest', (req, res) => {
+    const bell = typeof req.query.bell === 'string'
+        ? req.query.bell.replace(/[^a-z0-9-]/gi, '').slice(0, 64)
+        : '';
+    res.type('application/manifest+json').json({
+        name: 'SpelBel',
+        short_name: 'SpelBel',
+        description: 'Krijg een melding als de bel gaat bij de speeltuin',
+        lang: 'nl',
+        start_url: bell ? `/app?bell=${encodeURIComponent(bell)}` : '/app',
+        scope: '/',
+        display: 'standalone',
+        orientation: 'portrait',
+        background_color: '#ABE4FF',
+        theme_color: '#EE7533',
+        icons: [
+            { src: '/images/icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
+            { src: '/images/icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'any' },
+            { src: '/images/icon-maskable-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
+        ],
+    });
 });
+
+// The PWA's start_url. Plan 07 turns this into the full parent dashboard; for now it
+// serves the settings page, which also handles first-time subscribing.
+function renderApp(_req, res) {
+    res.send(render('push-settings.html', {
+        APP_NAME,
+        APP_URL,
+        VAPID_PUBLIC_KEY: process.env.VAPID_PUBLIC_KEY || '',
+    }));
+}
+
+app.get('/app', renderApp);
+app.get('/push/settings', renderApp);   // old links, still in notifications people kept
 
 // Push demo
 app.get('/push-demo', (req, res) => {
@@ -96,22 +132,33 @@ app.get('/bel/:id', async (req, res) => {
         const doorbell = await apiRes.json();
 
         const loc = doorbell.location ? `<p class="location">📍 ${doorbell.location}</p>` : '';
+
+        // Chat channels move behind a disclosure: every WhatsApp notification costs money
+        // and browser notifications do not, so push is the default and this is the fallback.
         const btns = doorbell.channels.map(c =>
             `<a href="${c.url}" class="btn btn-${c.icon}">${c.label}</a>`
         ).join('');
-        const empty = doorbell.channels.length === 0
+        const otherChannels = doorbell.channels.length
+            ? `<details class="other-channels">
+                 <summary>Liever via WhatsApp, Telegram of Signal?</summary>
+                 <p class="other-channels-note">Werkt ook, maar je krijgt de melding in een chat en wij betalen per bericht. Browsermeldingen zijn gratis en sneller.</p>
+                 ${btns}
+               </details>`
+            : '';
+        const empty = doorbell.channels.length === 0 && !doorbell.vapidPublicKey
             ? '<p class="empty">Nog geen kanalen beschikbaar. Probeer het later opnieuw.</p>'
             : '';
 
         const pushSection = doorbell.vapidPublicKey
-            ? buildPushSection(doorbell.id, doorbell.vapidPublicKey, APP_URL)
+            ? buildPushSection(doorbell.id, doorbell.vapidPublicKey, APP_URL, doorbell.name)
             : '';
 
         res.send(render('bell.html', {
             APP_NAME,
+            MANIFEST_HREF: `/manifest.webmanifest?bell=${encodeURIComponent(doorbell.slug || doorbell.id)}`,
             DOORBELL_NAME: doorbell.name,
             LOCATION: loc,
-            BUTTONS: btns,
+            OTHER_CHANNELS: otherChannels,
             EMPTY: empty,
             PUSH_SECTION: pushSection,
         }));
@@ -121,20 +168,84 @@ app.get('/bel/:id', async (req, res) => {
     }
 });
 
-function buildPushSection(doorbellId, vapidKey, appUrl) {
+function buildPushSection(doorbellId, vapidKey, appUrl, doorbellName) {
     return `
-<div id="push-section" style="margin-top:8px">
-  <button class="btn btn-push" id="push-btn">🔔 Aanmelden via browsermelding</button>
-  <a href="${appUrl}/push/settings" id="push-settings-link" style="display:none;margin-top:8px;font-size:.9rem;color:#4a5568;display:none">⚙️ Meldingsinstellingen →</a>
-  <div id="push-status" style="display:none;margin-top:8px;font-size:.9rem"></div>
+<div id="push-section">
+  <button class="btn btn-push" id="push-btn">🔔 Meldingen op mijn telefoon</button>
+  <p class="push-why">Gratis en direct. Je stelt zelf in wanneer je ze krijgt.</p>
+
+  <div id="ios-guide" style="display:none">
+    <p class="ios-intro"><strong>Nog één stap.</strong> Op de iPhone werken meldingen alleen als je SpelBel op je beginscherm zet:</p>
+    <ol class="ios-steps">
+      <li>Tik op <strong>Deel</strong> <span class="ios-icon">⬆️</span> onderin je scherm</li>
+      <li>Kies <strong>Zet op beginscherm</strong></li>
+      <li>Open SpelBel vanaf je beginscherm en zet meldingen aan</li>
+    </ol>
+  </div>
+
+  <div id="push-status" style="display:none"></div>
+  <a href="${appUrl}/app" id="push-settings-link" style="display:none">⚙️ Meldingsinstellingen →</a>
 </div>
 <script>
 (function() {
   const VAPID_KEY = '${vapidKey}';
   const DOORBELL_ID = '${doorbellId}';
-  const SUBSCRIBE_URL = '${appUrl}/webhook/subscribe/push';
-  const SETTINGS_URL = '${appUrl}/push/settings';
+  const DOORBELL_NAME = ${JSON.stringify(doorbellName || '')};
+  const API_BASE = '${appUrl}';
+  const SUBSCRIBE_URL = API_BASE + '/webhook/subscribe/push';
   const TOKEN_KEY = 'spelbel_push_token';
+
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+  const supported = 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window;
+
+  const $ = id => document.getElementById(id);
+  let installPrompt = null;   // Android/Chrome only
+
+  function status(msg, kind) {
+    const el = $('push-status');
+    el.textContent = msg;
+    el.className = kind || '';
+    el.style.display = '';
+  }
+
+  // The service worker cannot read localStorage, so mirror what it needs into a cache.
+  async function shareWithWorker(token) {
+    try {
+      const cache = await caches.open('spelbel-prefs');
+      await cache.put('token', new Response(token));
+      await cache.put('api-base', new Response(API_BASE));
+    } catch { /* not fatal: the worker falls back to opening the dashboard */ }
+  }
+
+  async function subscribe() {
+    const perm = await Notification.requestPermission();
+    if (perm !== 'granted') {
+      status('Je hebt meldingen geweigerd. Zet ze aan via de instellingen van je browser.', 'err');
+      return;
+    }
+    const reg = await navigator.serviceWorker.register('/sw.js');
+    await navigator.serviceWorker.ready;
+    const sub = await reg.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: urlBase64ToUint8Array(VAPID_KEY),
+    });
+    const r = await fetch(SUBSCRIBE_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ...sub.toJSON(), doorbellId: DOORBELL_ID }),
+    });
+    if (!r.ok) throw new Error(await r.text());
+    const data = await r.json();
+    if (data.token) {
+      localStorage.setItem(TOKEN_KEY, data.token);
+      await shareWithWorker(data.token);
+    }
+    $('push-btn').style.display = 'none';
+    $('ios-guide').style.display = 'none';
+    $('push-settings-link').style.display = 'block';
+    status('✅ Gelukt! Je krijgt een melding als de bel gaat bij ' + DOORBELL_NAME + '.', 'ok');
+  }
 
   function urlBase64ToUint8Array(b) {
     const p = '='.repeat((4 - b.length % 4) % 4);
@@ -142,44 +253,50 @@ function buildPushSection(doorbellId, vapidKey, appUrl) {
     return Uint8Array.from([...atob(s)].map(c => c.charCodeAt(0)));
   }
 
-  function showStatus(msg, color) {
-    const el = document.getElementById('push-status');
-    el.textContent = msg; el.style.color = color; el.style.display = '';
-  }
+  // Android/Chrome offers a real install prompt; iOS never does.
+  window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); installPrompt = e; });
 
-  async function init() {
-    if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
-    const reg = await navigator.serviceWorker.register('/sw.js');
-    const existing = await reg.pushManager.getSubscription();
-    if (existing) {
-      document.getElementById('push-btn').style.display = 'none';
-      document.getElementById('push-settings-link').style.display = '';
-      showStatus('✅ Browsermelding ingeschakeld', '#276749');
-    }
-  }
-
-  document.getElementById('push-btn').addEventListener('click', async () => {
-    const btn = document.getElementById('push-btn');
+  $('push-btn').addEventListener('click', async () => {
+    const btn = $('push-btn');
     try {
-      const perm = await Notification.requestPermission();
-      if (perm !== 'granted') { showStatus('Toestemming geweigerd.', '#c53030'); return; }
-      btn.disabled = true; btn.textContent = 'Bezig…';
-      const reg = await navigator.serviceWorker.ready;
-      const sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: urlBase64ToUint8Array(VAPID_KEY) });
-      const r = await fetch(SUBSCRIBE_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...sub.toJSON(), doorbellId: DOORBELL_ID }) });
-      if (!r.ok) throw new Error(await r.text());
-      const data = await r.json();
-      if (data.token) localStorage.setItem(TOKEN_KEY, data.token);
-      btn.style.display = 'none';
-      document.getElementById('push-settings-link').style.display = '';
-      showStatus('✅ Je ontvangt nu een melding als de bel gaat!', '#276749');
+      // On iOS, requestPermission() only works from a home-screen app, so installing
+      // has to come first — asking here would fail silently and look broken.
+      if (isIOS && !isStandalone) {
+        $('ios-guide').style.display = 'block';
+        btn.style.display = 'none';
+        return;
+      }
+      btn.disabled = true;
+      btn.textContent = 'Bezig…';
+      if (installPrompt) {
+        installPrompt.prompt();
+        await installPrompt.userChoice;   // either way, carry on and subscribe
+        installPrompt = null;
+      }
+      await subscribe();
     } catch (err) {
-      btn.disabled = false; btn.textContent = '🔔 Aanmelden via browsermelding';
-      showStatus('❌ ' + err.message, '#c53030');
+      btn.disabled = false;
+      btn.textContent = '🔔 Meldingen op mijn telefoon';
+      status('❌ ' + (err.message || 'Er ging iets mis'), 'err');
     }
   });
 
-  init();
+  (async function init() {
+    if (!supported) {
+      $('push-btn').style.display = 'none';
+      status('Deze browser ondersteunt geen meldingen. Kies hieronder een ander kanaal.', 'err');
+      return;
+    }
+    const reg = await navigator.serviceWorker.register('/sw.js').catch(() => null);
+    const existing = reg ? await reg.pushManager.getSubscription() : null;
+    if (existing) {
+      $('push-btn').style.display = 'none';
+      $('push-settings-link').style.display = 'block';
+      status('✅ Je krijgt al meldingen op dit apparaat.', 'ok');
+      const token = localStorage.getItem(TOKEN_KEY);
+      if (token) shareWithWorker(token);
+    }
+  })();
 })();
 </script>`;
 }
