@@ -202,6 +202,19 @@ function buildPushSection(doorbellId, vapidKey, appUrl, doorbellName) {
   const $ = id => document.getElementById(id);
   let installPrompt = null;   // Android/Chrome only
 
+  const platform = isIOS ? 'ios' : /Android/.test(navigator.userAgent) ? 'android' : 'desktop';
+  function track(event) {
+    // Fire and forget; a counter must never delay or break the flow.
+    try {
+      const body = JSON.stringify({ event, doorbellId: DOORBELL_ID, platform, standalone: isStandalone });
+      if (navigator.sendBeacon) {
+        navigator.sendBeacon(API_BASE + '/webhook/metrics/pwa', new Blob([body], { type: 'application/json' }));
+      } else {
+        fetch(API_BASE + '/webhook/metrics/pwa', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body, keepalive: true }).catch(() => {});
+      }
+    } catch { /* ignore */ }
+  }
+
   function status(msg, kind) {
     const el = $('push-status');
     el.textContent = msg;
@@ -221,9 +234,11 @@ function buildPushSection(doorbellId, vapidKey, appUrl, doorbellName) {
   async function subscribe() {
     const perm = await Notification.requestPermission();
     if (perm !== 'granted') {
+      track('permission_denied');
       status('Je hebt meldingen geweigerd. Zet ze aan via de instellingen van je browser.', 'err');
       return;
     }
+    track('permission_granted');
     const reg = await navigator.serviceWorker.register('/sw.js');
     await navigator.serviceWorker.ready;
     const sub = await reg.pushManager.subscribe({
@@ -241,6 +256,7 @@ function buildPushSection(doorbellId, vapidKey, appUrl, doorbellName) {
       localStorage.setItem(TOKEN_KEY, data.token);
       await shareWithWorker(data.token);
     }
+    track('subscribed');
     $('push-btn').style.display = 'none';
     $('ios-guide').style.display = 'none';
     $('push-settings-link').style.display = 'block';
@@ -262,6 +278,7 @@ function buildPushSection(doorbellId, vapidKey, appUrl, doorbellName) {
       // On iOS, requestPermission() only works from a home-screen app, so installing
       // has to come first — asking here would fail silently and look broken.
       if (isIOS && !isStandalone) {
+        track('install_guide');
         $('ios-guide').style.display = 'block';
         btn.style.display = 'none';
         return;
@@ -269,6 +286,7 @@ function buildPushSection(doorbellId, vapidKey, appUrl, doorbellName) {
       btn.disabled = true;
       btn.textContent = 'Bezig…';
       if (installPrompt) {
+        track('install_prompt');
         installPrompt.prompt();
         await installPrompt.userChoice;   // either way, carry on and subscribe
         installPrompt = null;
@@ -282,6 +300,7 @@ function buildPushSection(doorbellId, vapidKey, appUrl, doorbellName) {
   });
 
   (async function init() {
+    track('bell_view');
     if (!supported) {
       $('push-btn').style.display = 'none';
       status('Deze browser ondersteunt geen meldingen. Kies hieronder een ander kanaal.', 'err');
