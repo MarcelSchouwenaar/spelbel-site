@@ -293,6 +293,7 @@ function buildPushSection(doorbellId, vapidKey, appUrl, doorbellName) {
     $('install-guide').style.display = 'none';
     $('push-settings-link').style.display = 'block';
     status('✅ Gelukt! Je krijgt een melding als de bel gaat bij ' + DOORBELL_NAME + '.', 'ok');
+    $('push-btn').textContent = '🔔 Meldingen op mijn telefoon';
   }
 
   function urlBase64ToUint8Array(b) {
@@ -380,7 +381,14 @@ function buildPushSection(doorbellId, vapidKey, appUrl, doorbellName) {
       // Install-first everywhere it is possible: notifications arrive under the app's own
       // icon and survive clearing browser data. On iOS it is not a preference — Safari
       // refuses permission outside an installed app.
-      const policy = installPolicy({ isIOS, isSafari, isDesktop, isStandalone, canPrompt: !!installPrompt });
+      // Already subscribed on this device? Then this is "add another bell", and the
+      // install nudge would be noise — the app is evidently working.
+      const reg = await navigator.serviceWorker.getRegistration('/sw.js').catch(() => null);
+      const alreadySubscribed = reg ? await reg.pushManager.getSubscription() : null;
+
+      const policy = alreadySubscribed
+        ? 'direct'
+        : installPolicy({ isIOS, isSafari, isDesktop, isStandalone, canPrompt: !!installPrompt });
       if (policy !== 'direct' && policy !== 'no-install' && showInstallGuide(policy)) return;
       await subscribeWithFeedback(btn, '🔔 Meldingen op mijn telefoon');
     } catch (err) {
@@ -437,11 +445,14 @@ function buildPushSection(doorbellId, vapidKey, appUrl, doorbellName) {
     // reached us, the browser has one and we have no row, and saying "you are subscribed"
     // means this parent is never notified. Re-post it — the endpoint is idempotent and
     // returns the existing token, so this both verifies and repairs. F-002.
+    //
+    // Deliberately without a doorbellId: subscribing to a bell is something a parent
+    // asks for, not a side effect of opening its page. F-004.
     try {
       const r = await fetch(SUBSCRIBE_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...existing.toJSON(), doorbellId: DOORBELL_ID }),
+        body: JSON.stringify(existing.toJSON()),
         keepalive: true,
       });
       if (!r.ok) throw new Error('not registered');
@@ -450,9 +461,19 @@ function buildPushSection(doorbellId, vapidKey, appUrl, doorbellName) {
         localStorage.setItem(TOKEN_KEY, data.token);
         await shareWithWorker(data.token);
       }
-      $('push-btn').style.display = 'none';
+
       $('push-settings-link').style.display = 'block';
-      status('✅ Je krijgt al meldingen op dit apparaat.', 'ok');
+
+      if ((data.doorbellIds || []).includes(DOORBELL_ID)) {
+        $('push-btn').style.display = 'none';
+        status('✅ Je krijgt al meldingen van ' + DOORBELL_NAME + '.', 'ok');
+      } else {
+        // Notifications work on this device, but not yet for this bell. One tap adds it —
+        // the previous wording made this look like there was nothing left to do.
+        $('push-btn').textContent = '🔔 Ook meldingen voor ' + DOORBELL_NAME;
+        const why = document.querySelector('.push-why');
+        if (why) why.textContent = 'Je krijgt al meldingen van een andere SpelBel op dit apparaat.';
+      }
     } catch {
       // Leave the button in place so the parent can simply try again.
       status('Meldingen waren nog niet helemaal ingesteld. Tik op de knop om het af te maken.', 'err');
