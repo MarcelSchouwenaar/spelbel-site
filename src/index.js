@@ -197,7 +197,26 @@ function buildPushSection(doorbellId, vapidKey, appUrl, doorbellName) {
 
   const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
   const isStandalone = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
-  const supported = 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window;
+
+  // Four outcomes, because they need four different screens. Detected by capability, never
+  // by user agent: browsers without push (DuckDuckGo, Firefox Focus, most in-app webviews)
+  // are a moving target, and the next one will not be in any list we hardcode today.
+  async function classifySupport() {
+    if (!window.isSecureContext) return 'unsupported';
+    if (!('serviceWorker' in navigator) || !('PushManager' in window) || !('Notification' in window)) return 'unsupported';
+    if (typeof Notification.requestPermission !== 'function') return 'unsupported';
+    if (Notification.permission === 'denied') return 'blocked';
+    // iOS refuses permission outside a home-screen app, so installing comes first.
+    if (isIOS && !isStandalone) return 'needs-install';
+    try {
+      const reg = await navigator.serviceWorker.register('/sw.js');
+      // Some browsers expose PushManager on window but not on a registration.
+      if (!reg || !reg.pushManager) return 'unsupported';
+    } catch {
+      return 'unsupported';   // private windows and locked-down browsers throw here
+    }
+    return 'ready';
+  }
 
   const $ = id => document.getElementById(id);
   let installPrompt = null;   // Android/Chrome only
@@ -277,7 +296,7 @@ function buildPushSection(doorbellId, vapidKey, appUrl, doorbellName) {
     try {
       // On iOS, requestPermission() only works from a home-screen app, so installing
       // has to come first — asking here would fail silently and look broken.
-      if (isIOS && !isStandalone) {
+      if (await classifySupport() === 'needs-install') {
         track('install_guide');
         $('ios-guide').style.display = 'block';
         btn.style.display = 'none';
@@ -299,14 +318,46 @@ function buildPushSection(doorbellId, vapidKey, appUrl, doorbellName) {
     }
   });
 
+  // No push here: lead with the chat channels instead of a dead end. Opening the
+  // disclosure is the whole point — for these parents it is the only way to subscribe.
+  function fallbackToChannels(message) {
+    $('push-btn').style.display = 'none';
+    const why = document.querySelector('.push-why');
+    if (why) why.style.display = 'none';
+    status(message, 'err');
+
+    const details = document.querySelector('.other-channels');
+    if (details) {
+      // Move the channels above the push block: for this browser they are the offer,
+      // not the fallback.
+      const section = $('push-section');
+      if (section && section.parentNode) section.parentNode.insertBefore(details, section);
+      details.open = true;
+      const summary = details.querySelector('summary');
+      if (summary) summary.textContent = 'Meld je aan via WhatsApp, Telegram of Signal';
+      const note = details.querySelector('.other-channels-note');
+      if (note) note.textContent = 'Zodra je browser meldingen ondersteunt, kun je overstappen op gratis telefoonmeldingen.';
+    } else {
+      status(message + ' Er zijn op dit moment geen andere kanalen beschikbaar voor deze bel.', 'err');
+    }
+  }
+
   (async function init() {
     track('bell_view');
-    if (!supported) {
-      $('push-btn').style.display = 'none';
-      status('Deze browser ondersteunt geen meldingen. Kies hieronder een ander kanaal.', 'err');
+    const support = await classifySupport();
+
+    if (support === 'unsupported') {
+      track('push_unsupported');
+      fallbackToChannels('Deze browser kan geen meldingen ontvangen.');
       return;
     }
-    const reg = await navigator.serviceWorker.register('/sw.js').catch(() => null);
+    if (support === 'blocked') {
+      track('push_blocked');
+      fallbackToChannels('Meldingen staan geblokkeerd voor deze site. Zet ze aan in je browserinstellingen en ververs de pagina.');
+      return;
+    }
+
+    const reg = await navigator.serviceWorker.getRegistration('/sw.js').catch(() => null);
     const existing = reg ? await reg.pushManager.getSubscription() : null;
     if (existing) {
       $('push-btn').style.display = 'none';

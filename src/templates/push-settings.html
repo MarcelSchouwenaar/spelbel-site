@@ -124,12 +124,18 @@
       } catch { return null; }
     }
 
+    function pushSupported() {
+      return window.isSecureContext
+        && 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window
+        && typeof Notification.requestPermission === 'function';
+    }
+
     async function enablePush() {
       const btn = document.getElementById('enable-btn');
       const msg = document.getElementById('enable-msg');
       btn.disabled = true; btn.textContent = 'Bezig…';
       try {
-        if (!('serviceWorker' in navigator) || !('PushManager' in window)) throw new Error('Deze browser ondersteunt geen meldingen.');
+        if (!pushSupported()) throw new Error('Deze browser kan geen meldingen ontvangen. Open SpelBel in Safari of Chrome, of meld je aan via WhatsApp.');
         const perm = await Notification.requestPermission();
         if (perm !== 'granted') throw new Error('Je hebt meldingen geweigerd. Zet ze aan in de instellingen van je telefoon.');
         const reg = await navigator.serviceWorker.register('/sw.js');
@@ -158,6 +164,14 @@
     async function showEnable() {
       document.getElementById('loading').style.display = 'none';
       const panel = document.getElementById('enable');
+      if (!pushSupported()) {
+        document.getElementById('enable-title').textContent = 'Meldingen niet beschikbaar';
+        document.getElementById('enable-sub').textContent =
+          'Deze browser kan geen meldingen ontvangen. Open SpelBel in Safari of Chrome, of meld je aan via WhatsApp bij de bel.';
+        document.getElementById('enable-btn').style.display = 'none';
+        panel.style.display = '';
+        return;
+      }
       if (bellFromUrl) {
         try {
           const res = await fetch(`${API_BASE}/webhook/api/public/doorbells/${encodeURIComponent(bellFromUrl)}`);
