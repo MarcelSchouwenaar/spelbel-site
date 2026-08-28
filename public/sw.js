@@ -6,6 +6,12 @@
 
 const FALLBACK_URL = '/app';
 
+// Without these, a new worker sits in "waiting" until every tab and installed-app window
+// for the origin has closed — so a fix can take days to reach a device that already has a
+// worker, or never, if the app is always open. F-003.
+self.addEventListener('install', () => self.skipWaiting());
+self.addEventListener('activate', event => event.waitUntil(self.clients.claim()));
+
 self.addEventListener('push', event => {
     const data = event.data ? event.data.json() : {};
     const title = data.title || 'SpelBel 🔔';

@@ -174,13 +174,11 @@ function buildPushSection(doorbellId, vapidKey, appUrl, doorbellName) {
   <button class="btn btn-push" id="push-btn">🔔 Meldingen op mijn telefoon</button>
   <p class="push-why">Gratis en direct. Je stelt zelf in wanneer je ze krijgt.</p>
 
-  <div id="ios-guide" style="display:none">
-    <p class="ios-intro"><strong>Nog één stap.</strong> Op de iPhone werken meldingen alleen als je SpelBel op je beginscherm zet:</p>
-    <ol class="ios-steps">
-      <li>Tik op <strong>Deel</strong> <span class="ios-icon">⬆️</span> onderin je scherm</li>
-      <li>Kies <strong>Zet op beginscherm</strong></li>
-      <li>Open SpelBel vanaf je beginscherm en zet meldingen aan</li>
-    </ol>
+  <div id="install-guide" style="display:none">
+    <p class="ios-intro" id="install-intro"></p>
+    <ol class="ios-steps" id="install-steps"></ol>
+    <button class="btn-push" id="install-btn" style="display:none;margin-top:16px">Toevoegen aan beginscherm</button>
+    <a href="#" id="install-skip" style="display:none">Liever niet installeren — meld me aan in deze browser</a>
   </div>
 
   <div id="push-status" style="display:none"></div>
@@ -195,12 +193,26 @@ function buildPushSection(doorbellId, vapidKey, appUrl, doorbellName) {
   const SUBSCRIBE_URL = API_BASE + '/webhook/subscribe/push';
   const TOKEN_KEY = 'spelbel_push_token';
 
-  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+  const ua = navigator.userAgent;
+  const isIOS = /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
+  // Chrome, Firefox and DuckDuckGo on iOS cannot install to the home screen at all, so
+  // nudging them there is a dead end — they must be allowed to subscribe in place.
+  const isSafari = isIOS && !/CriOS|FxiOS|EdgiOS|DuckDuckGo|OPT\//.test(ua);
+  const isDesktop = !/Android|iPad|iPhone|iPod|Mobile/i.test(ua);
   const isStandalone = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
 
   // Four outcomes, because they need four different screens. Detected by capability, never
   // by user agent: browsers without push (DuckDuckGo, Firefox Focus, most in-app webviews)
   // are a moving target, and the next one will not be in any list we hardcode today.
+  // Where a parent should be sent once we know push is possible. Pure and named so it can
+  // be tested against every platform shape without a browser.
+  function installPolicy(env) {
+    if (env.isStandalone) return 'direct';        // already installed
+    if (env.isDesktop) return 'direct';           // installing a PWA on a laptop is odd, and push works as-is
+    if (env.isIOS) return env.isSafari ? 'ios-install' : 'no-install';
+    return env.canPrompt ? 'prompt-install' : 'manual-install';
+  }
+
   async function classifySupport() {
     if (!window.isSecureContext) return 'unsupported';
     if (!('serviceWorker' in navigator) || !('PushManager' in window) || !('Notification' in window)) return 'unsupported';
@@ -268,6 +280,7 @@ function buildPushSection(doorbellId, vapidKey, appUrl, doorbellName) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ ...sub.toJSON(), doorbellId: DOORBELL_ID }),
+      keepalive: true,
     });
     if (!r.ok) throw new Error(await r.text());
     const data = await r.json();
@@ -277,7 +290,7 @@ function buildPushSection(doorbellId, vapidKey, appUrl, doorbellName) {
     }
     track('subscribed');
     $('push-btn').style.display = 'none';
-    $('ios-guide').style.display = 'none';
+    $('install-guide').style.display = 'none';
     $('push-settings-link').style.display = 'block';
     status('✅ Gelukt! Je krijgt een melding als de bel gaat bij ' + DOORBELL_NAME + '.', 'ok');
   }
@@ -291,26 +304,85 @@ function buildPushSection(doorbellId, vapidKey, appUrl, doorbellName) {
   // Android/Chrome offers a real install prompt; iOS never does.
   window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); installPrompt = e; });
 
+  const GUIDES = {
+    'ios-install': {
+      intro: '<strong>Nog één stap.</strong> Op de iPhone werken meldingen alleen als je SpelBel op je beginscherm zet:',
+      steps: ['Tik op <strong>Deel</strong> <span class="ios-icon">⬆️</span> onderin je scherm',
+              'Kies <strong>Zet op beginscherm</strong>',
+              'Open SpelBel vanaf je beginscherm en zet meldingen aan'],
+      skip: false,   // iOS cannot subscribe outside an installed app, so there is no way out
+    },
+    'prompt-install': {
+      intro: '<strong>Zet SpelBel op je beginscherm.</strong> Dan komen meldingen binnen als van een gewone app, met een eigen icoon — en blijf je aangemeld als je je browsergegevens wist.',
+      steps: [],
+      skip: true,
+    },
+    'manual-install': {
+      intro: '<strong>Zet SpelBel op je beginscherm</strong> voor meldingen als van een gewone app:',
+      steps: ['Open het menu van je browser (⋮)', 'Kies <strong>Toevoegen aan startscherm</strong>',
+              'Open SpelBel vanaf je beginscherm'],
+      skip: true,
+    },
+  };
+
+  function showInstallGuide(policy) {
+    const guide = GUIDES[policy];
+    if (!guide) return false;
+
+    $('install-intro').innerHTML = guide.intro;
+    $('install-steps').innerHTML = guide.steps.map(function (t) { return '<li>' + t + '</li>'; }).join('');
+    $('install-steps').style.display = guide.steps.length ? '' : 'none';
+    $('install-btn').style.display = policy === 'prompt-install' ? 'block' : 'none';
+    $('install-skip').style.display = guide.skip ? 'block' : 'none';
+    $('install-guide').style.display = 'block';
+    $('push-btn').style.display = 'none';
+    const why = document.querySelector('.push-why');
+    if (why) why.style.display = 'none';
+    track('install_nudge');
+    return true;
+  }
+
+  async function subscribeWithFeedback(btn, label) {
+    try {
+      btn.disabled = true;
+      btn.textContent = 'Bezig…';
+      await subscribe();
+    } catch (err) {
+      btn.disabled = false;
+      btn.textContent = label;
+      status('❌ ' + (err.message || 'Er ging iets mis'), 'err');
+    }
+  }
+
+  $('install-btn').addEventListener('click', async () => {
+    const btn = $('install-btn');
+    if (!installPrompt) return subscribeWithFeedback(btn, 'Toevoegen aan beginscherm');
+    track('install_prompt');
+    installPrompt.prompt();
+    const choice = await installPrompt.userChoice;
+    installPrompt = null;
+    track(choice.outcome === 'accepted' ? 'install_accepted' : 'install_dismissed');
+    // Subscribe either way: on Android the subscription carries into the installed app,
+    // so declining should not cost the parent their notifications.
+    await subscribeWithFeedback(btn, 'Toevoegen aan beginscherm');
+  });
+
+  $('install-skip').addEventListener('click', async (e) => {
+    e.preventDefault();
+    track('install_skipped');
+    $('install-guide').style.display = 'none';
+    await subscribeWithFeedback($('push-btn'), '🔔 Meldingen op mijn telefoon');
+  });
+
   $('push-btn').addEventListener('click', async () => {
     const btn = $('push-btn');
     try {
-      // On iOS, requestPermission() only works from a home-screen app, so installing
-      // has to come first — asking here would fail silently and look broken.
-      if (await classifySupport() === 'needs-install') {
-        track('install_guide');
-        $('ios-guide').style.display = 'block';
-        btn.style.display = 'none';
-        return;
-      }
-      btn.disabled = true;
-      btn.textContent = 'Bezig…';
-      if (installPrompt) {
-        track('install_prompt');
-        installPrompt.prompt();
-        await installPrompt.userChoice;   // either way, carry on and subscribe
-        installPrompt = null;
-      }
-      await subscribe();
+      // Install-first everywhere it is possible: notifications arrive under the app's own
+      // icon and survive clearing browser data. On iOS it is not a preference — Safari
+      // refuses permission outside an installed app.
+      const policy = installPolicy({ isIOS, isSafari, isDesktop, isStandalone, canPrompt: !!installPrompt });
+      if (policy !== 'direct' && policy !== 'no-install' && showInstallGuide(policy)) return;
+      await subscribeWithFeedback(btn, '🔔 Meldingen op mijn telefoon');
     } catch (err) {
       btn.disabled = false;
       btn.textContent = '🔔 Meldingen op mijn telefoon';
@@ -359,12 +431,31 @@ function buildPushSection(doorbellId, vapidKey, appUrl, doorbellName) {
 
     const reg = await navigator.serviceWorker.getRegistration('/sw.js').catch(() => null);
     const existing = reg ? await reg.pushManager.getSubscription() : null;
-    if (existing) {
+    if (!existing) return;
+
+    // A local subscription is not proof of anything: if the POST that registers it never
+    // reached us, the browser has one and we have no row, and saying "you are subscribed"
+    // means this parent is never notified. Re-post it — the endpoint is idempotent and
+    // returns the existing token, so this both verifies and repairs. F-002.
+    try {
+      const r = await fetch(SUBSCRIBE_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...existing.toJSON(), doorbellId: DOORBELL_ID }),
+        keepalive: true,
+      });
+      if (!r.ok) throw new Error('not registered');
+      const data = await r.json();
+      if (data.token) {
+        localStorage.setItem(TOKEN_KEY, data.token);
+        await shareWithWorker(data.token);
+      }
       $('push-btn').style.display = 'none';
       $('push-settings-link').style.display = 'block';
       status('✅ Je krijgt al meldingen op dit apparaat.', 'ok');
-      const token = localStorage.getItem(TOKEN_KEY);
-      if (token) shareWithWorker(token);
+    } catch {
+      // Leave the button in place so the parent can simply try again.
+      status('Meldingen waren nog niet helemaal ingesteld. Tik op de knop om het af te maken.', 'err');
     }
   })();
 })();

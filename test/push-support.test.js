@@ -116,3 +116,57 @@ test('a blocked site is reported as blocked, not unsupported', async () => {
 test('blocked is decided before the iOS install rule', async () => {
     assert.equal(await run({ permission: 'denied', isIOS: true, isStandalone: false }), 'blocked');
 });
+
+// ── Install policy ──────────────────────────────────────────────────────────
+// Install-first everywhere it is possible, because notifications then arrive under the
+// app's own icon and survive clearing browser data. The exceptions are what these cover.
+
+function extractPolicy() {
+    const src = fs.readFileSync(path.join(__dirname, '..', 'src', 'index.js'), 'utf8');
+    const start = src.indexOf('function installPolicy(env)');
+    assert.ok(start > -1, 'installPolicy not found — did the bell page script change?');
+    let depth = 0, i = src.indexOf('{', start);
+    for (; i < src.length; i++) {
+        if (src[i] === '{') depth++;
+        else if (src[i] === '}') { depth--; if (depth === 0) break; }
+    }
+    return src.slice(start, i + 1);
+}
+
+const POLICY = extractPolicy();
+
+function policy(env) {
+    const context = {};
+    vm.createContext(context);
+    return vm.runInContext(`${POLICY}; installPolicy(${JSON.stringify(env)});`, context);
+}
+
+test('an already-installed app subscribes directly', () => {
+    assert.equal(policy({ isStandalone: true, isIOS: true, isSafari: true }), 'direct');
+});
+
+test('desktop subscribes directly — installing a PWA on a laptop is odd', () => {
+    assert.equal(policy({ isDesktop: true }), 'direct');
+});
+
+test('iOS Safari is sent to the install guide', () => {
+    assert.equal(policy({ isIOS: true, isSafari: true }), 'ios-install');
+});
+
+test('Chrome and Firefox on iOS cannot install, so they are never nudged', () => {
+    // They cannot add to the home screen at all; a nudge would be a dead end.
+    assert.equal(policy({ isIOS: true, isSafari: false }), 'no-install');
+});
+
+test('Android with an install prompt gets the one-tap install', () => {
+    assert.equal(policy({ canPrompt: true }), 'prompt-install');
+});
+
+test('Android without an install prompt gets manual instructions', () => {
+    // Firefox on Android supports push and installing, but fires no beforeinstallprompt.
+    assert.equal(policy({ canPrompt: false }), 'manual-install');
+});
+
+test('standalone wins over every other signal', () => {
+    assert.equal(policy({ isStandalone: true, isDesktop: false, canPrompt: true }), 'direct');
+});
