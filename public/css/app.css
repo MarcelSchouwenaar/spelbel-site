@@ -107,9 +107,9 @@ body.bell-page {
 #push-status.err { color: #c53030; }
 #push-settings-link { display: block; margin-top: 14px; font-size: .9rem; color: #5A6360; }
 
-/* iOS cannot grant notification permission until the app is on the home screen, so
-   these steps are the whole flow for roughly half of all parents. */
-#ios-guide { margin-top: 18px; text-align: left; background: #F4F6F5; border-radius: 14px; padding: 18px 20px; }
+/* The install nudge. On iOS this is not a preference: Safari refuses notification
+   permission until the app is on the home screen. */
+#install-guide { margin-top: 18px; text-align: left; background: #F4F6F5; border-radius: 14px; padding: 18px 20px; }
 .ios-intro { font-size: .95rem; margin: 0 0 12px; color: #1A1A1A; }
 .ios-steps { margin: 0; padding-left: 0; list-style: none; counter-reset: iosstep; }
 .ios-steps li {
@@ -125,6 +125,7 @@ body.bell-page {
   display: flex; align-items: center; justify-content: center;
 }
 .ios-icon { display: inline-block; }
+#install-skip { display: block; margin-top: 14px; font-size: .85rem; color: #5A6360; text-decoration: underline; }
 
 .other-channels { margin-top: 28px; text-align: left; }
 .other-channels summary {

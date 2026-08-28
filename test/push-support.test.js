@@ -116,3 +116,106 @@ test('a blocked site is reported as blocked, not unsupported', async () => {
 test('blocked is decided before the iOS install rule', async () => {
     assert.equal(await run({ permission: 'denied', isIOS: true, isStandalone: false }), 'blocked');
 });
+
+// ── Install policy ──────────────────────────────────────────────────────────
+// Install-first everywhere it is possible, because notifications then arrive under the
+// app's own icon and survive clearing browser data. The exceptions are what these cover.
+
+function extractPolicy() {
+    const src = fs.readFileSync(path.join(__dirname, '..', 'src', 'index.js'), 'utf8');
+    const start = src.indexOf('function installPolicy(env)');
+    assert.ok(start > -1, 'installPolicy not found — did the bell page script change?');
+    let depth = 0, i = src.indexOf('{', start);
+    for (; i < src.length; i++) {
+        if (src[i] === '{') depth++;
+        else if (src[i] === '}') { depth--; if (depth === 0) break; }
+    }
+    return src.slice(start, i + 1);
+}
+
+const POLICY = extractPolicy();
+
+function policy(env) {
+    const context = {};
+    vm.createContext(context);
+    return vm.runInContext(`${POLICY}; installPolicy(${JSON.stringify(env)});`, context);
+}
+
+test('an already-installed app subscribes directly', () => {
+    assert.equal(policy({ isStandalone: true, isIOS: true, isSafari: true }), 'direct');
+});
+
+test('desktop subscribes directly — installing a PWA on a laptop is odd', () => {
+    assert.equal(policy({ isDesktop: true }), 'direct');
+});
+
+test('iOS Safari is sent to the install guide', () => {
+    assert.equal(policy({ isIOS: true, isSafari: true }), 'ios-install');
+});
+
+test('Chrome and Firefox on iOS cannot install, so they are never nudged', () => {
+    // They cannot add to the home screen at all; a nudge would be a dead end.
+    assert.equal(policy({ isIOS: true, isSafari: false }), 'no-install');
+});
+
+test('Android with an install prompt gets the one-tap install', () => {
+    assert.equal(policy({ canPrompt: true }), 'prompt-install');
+});
+
+test('Android without an install prompt gets manual instructions', () => {
+    // Firefox on Android supports push and installing, but fires no beforeinstallprompt.
+    assert.equal(policy({ canPrompt: false }), 'manual-install');
+});
+
+test('standalone wins over every other signal', () => {
+    assert.equal(policy({ isStandalone: true, isDesktop: false, canPrompt: true }), 'direct');
+});
+
+// ── The generated page script must be valid JavaScript ──────────────────────
+// buildPushSection() assembles browser code inside a template literal, so an escape
+// sequence meant for the browser can be eaten by Node instead. That happened: a `\/`
+// in a regex collapsed to `/`, terminating the literal and killing the whole script —
+// invisible to `node --check` on the source, since the source itself was fine.
+
+test('the script sent to the browser parses', () => {
+    const src = fs.readFileSync(path.join(__dirname, '..', 'src', 'index.js'), 'utf8');
+    const start = src.indexOf('function buildPushSection(');
+    assert.ok(start > -1, 'buildPushSection not found');
+    let depth = 0, i = src.indexOf('{', start);
+    for (; i < src.length; i++) {
+        if (src[i] === '{') depth++;
+        else if (src[i] === '}') { depth--; if (depth === 0) break; }
+    }
+    const factory = src.slice(start, i + 1);
+
+    const context = { JSON };
+    vm.createContext(context);
+    const html = vm.runInContext(
+        `${factory}; buildPushSection('bell-id', 'vapid-key', 'https://app.example', 'Speeltuin Noord');`,
+        context
+    );
+
+    const scripts = [...html.matchAll(/<script[^>]*>([\s\S]*?)<\/script>/g)].map(m => m[1]);
+    assert.ok(scripts.length, 'no inline script in the generated markup');
+    for (const js of scripts) {
+        assert.doesNotThrow(() => new vm.Script(js), 'generated script is not valid JavaScript');
+    }
+});
+
+test('no unreplaced placeholders survive into the page', () => {
+    const src = fs.readFileSync(path.join(__dirname, '..', 'src', 'index.js'), 'utf8');
+    const start = src.indexOf('function buildPushSection(');
+    let depth = 0, i = src.indexOf('{', start);
+    for (; i < src.length; i++) {
+        if (src[i] === '{') depth++;
+        else if (src[i] === '}') { depth--; if (depth === 0) break; }
+    }
+    const context = { JSON };
+    vm.createContext(context);
+    const html = vm.runInContext(
+        `${src.slice(start, i + 1)}; buildPushSection('b', 'k', 'https://a.example', 'Naam');`,
+        context
+    );
+    assert.equal(html.match(/\{\{[A-Z_]+\}\}/g), null);
+    assert.ok(html.includes('https://a.example'), 'appUrl was not interpolated');
+});
