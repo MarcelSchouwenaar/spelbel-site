@@ -265,7 +265,7 @@ function markerGrootte(n) { return Math.min(34 + n*1.6, 64); }
 
 function initKaart() {
   kaart = L.map('kaart', { scrollWheelZoom: true, zoomControl: true }).setView([51.9, 4.9], 8);
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { attribution: '© OpenStreetMap © CARTO', maxZoom: 19 }).addTo(kaart);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>', maxZoom: 19 }).addTo(kaart);
   kaart.on('click', e => { if (!plaatsModus) return; kiesNieuweLocatie(e.latlng.lat, e.latlng.lng); });
 }
 
