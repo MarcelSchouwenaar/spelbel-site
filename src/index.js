@@ -197,7 +197,7 @@ function buildPushSection(doorbellId, vapidKey, appUrl, doorbellName) {
   const isIOS = /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
   // Chrome, Firefox and DuckDuckGo on iOS cannot install to the home screen at all, so
   // nudging them there is a dead end — they must be allowed to subscribe in place.
-  const isSafari = isIOS && !/CriOS|FxiOS|EdgiOS|DuckDuckGo|OPT\//.test(ua);
+  const isSafari = isIOS && !/CriOS|FxiOS|EdgiOS|DuckDuckGo|OPT/.test(ua);
   const isDesktop = !/Android|iPad|iPhone|iPod|Mobile/i.test(ua);
   const isStandalone = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
 

@@ -170,3 +170,52 @@ test('Android without an install prompt gets manual instructions', () => {
 test('standalone wins over every other signal', () => {
     assert.equal(policy({ isStandalone: true, isDesktop: false, canPrompt: true }), 'direct');
 });
+
+// ── The generated page script must be valid JavaScript ──────────────────────
+// buildPushSection() assembles browser code inside a template literal, so an escape
+// sequence meant for the browser can be eaten by Node instead. That happened: a `\/`
+// in a regex collapsed to `/`, terminating the literal and killing the whole script —
+// invisible to `node --check` on the source, since the source itself was fine.
+
+test('the script sent to the browser parses', () => {
+    const src = fs.readFileSync(path.join(__dirname, '..', 'src', 'index.js'), 'utf8');
+    const start = src.indexOf('function buildPushSection(');
+    assert.ok(start > -1, 'buildPushSection not found');
+    let depth = 0, i = src.indexOf('{', start);
+    for (; i < src.length; i++) {
+        if (src[i] === '{') depth++;
+        else if (src[i] === '}') { depth--; if (depth === 0) break; }
+    }
+    const factory = src.slice(start, i + 1);
+
+    const context = { JSON };
+    vm.createContext(context);
+    const html = vm.runInContext(
+        `${factory}; buildPushSection('bell-id', 'vapid-key', 'https://app.example', 'Speeltuin Noord');`,
+        context
+    );
+
+    const scripts = [...html.matchAll(/<script[^>]*>([\s\S]*?)<\/script>/g)].map(m => m[1]);
+    assert.ok(scripts.length, 'no inline script in the generated markup');
+    for (const js of scripts) {
+        assert.doesNotThrow(() => new vm.Script(js), 'generated script is not valid JavaScript');
+    }
+});
+
+test('no unreplaced placeholders survive into the page', () => {
+    const src = fs.readFileSync(path.join(__dirname, '..', 'src', 'index.js'), 'utf8');
+    const start = src.indexOf('function buildPushSection(');
+    let depth = 0, i = src.indexOf('{', start);
+    for (; i < src.length; i++) {
+        if (src[i] === '{') depth++;
+        else if (src[i] === '}') { depth--; if (depth === 0) break; }
+    }
+    const context = { JSON };
+    vm.createContext(context);
+    const html = vm.runInContext(
+        `${src.slice(start, i + 1)}; buildPushSection('b', 'k', 'https://a.example', 'Naam');`,
+        context
+    );
+    assert.equal(html.match(/\{\{[A-Z_]+\}\}/g), null);
+    assert.ok(html.includes('https://a.example'), 'appUrl was not interpolated');
+});
