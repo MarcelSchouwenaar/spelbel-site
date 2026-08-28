@@ -28,6 +28,12 @@
     #no-token, #loading { text-align: center; padding: 60px 0; color: #888; }
   </style>
   <link rel="icon" type="image/svg+xml" href="/images/app-icon-v1.svg">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="SpelBel">
+  <meta name="theme-color" content="#EE7533">
 </head>
 <body>
   <div class="logo"><img src="/images/logo.svg" alt="{{APP_NAME}}"></div>
@@ -35,9 +41,18 @@
   <p class="sub">Beheer je browsermeldingen voor SpelBel op dit apparaat.</p>
 
   <div id="loading">Laden…</div>
+  <div id="enable" style="display:none">
+    <div class="card">
+      <h2 id="enable-title">Meldingen aanzetten</h2>
+      <p style="font-size:.9rem;color:#666;line-height:1.5" id="enable-sub">Zet meldingen aan om te horen wanneer de bel gaat.</p>
+      <button class="btn-snooze" style="background:#EE7533;margin-top:12px" id="enable-btn" onclick="enablePush()">🔔 Meldingen aanzetten</button>
+      <div class="msg" id="enable-msg"></div>
+    </div>
+  </div>
+
   <div id="no-token" style="display:none">
     <p>Geen abonnement gevonden op dit apparaat.</p>
-    <p style="font-size:.9rem">Meld je aan via de QR-code bij een SpelBel.</p>
+    <p style="font-size:.9rem">Scan de QR-code bij een SpelBel om je aan te melden.</p>
   </div>
 
   <div id="content" style="display:none">
@@ -60,7 +75,116 @@
 
   <script>
     const TOKEN_KEY = 'spelbel_push_token';
+    const API_BASE = '{{APP_URL}}';
+    const VAPID_KEY = '{{VAPID_PUBLIC_KEY}}';
+    const params = new URLSearchParams(location.search);
+    const bellFromUrl = params.get('bell');   // baked into start_url by the per-bell manifest
+
     let token = localStorage.getItem(TOKEN_KEY);
+
+    // A notification deep link carries the token in the fragment, which never reaches the
+    // server — no access log, no Referer. Take it, keep it, and clean the address bar.
+    if (location.hash.startsWith('#token=')) {
+      token = decodeURIComponent(location.hash.slice(7));
+      localStorage.setItem(TOKEN_KEY, token);
+      history.replaceState({}, '', location.pathname + location.search);
+    }
+
+    // The service worker cannot read localStorage; mirror what it needs into a cache.
+    async function shareWithWorker(t) {
+      try {
+        const cache = await caches.open('spelbel-prefs');
+        await cache.put('token', new Response(t));
+        await cache.put('api-base', new Response(API_BASE));
+      } catch { /* not fatal */ }
+    }
+
+    function urlBase64ToUint8Array(b) {
+      const p = '='.repeat((4 - b.length % 4) % 4);
+      const s = (b + p).replace(/-/g, '+').replace(/_/g, '/');
+      return Uint8Array.from([...atob(s)].map(c => c.charCodeAt(0)));
+    }
+
+    // Recovery: this device is subscribed but the token is gone (cleared storage, or the
+    // subscription was made in Safari and we are now in the installed app). Re-posting the
+    // same endpoint returns the token that already belongs to it.
+    async function recoverToken() {
+      try {
+        const reg = await navigator.serviceWorker.getRegistration('/sw.js');
+        const sub = reg && await reg.pushManager.getSubscription();
+        if (!sub) return null;
+        const res = await fetch(API_BASE + '/webhook/subscribe/push', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(sub.toJSON()),
+        });
+        if (!res.ok) return null;
+        const data = await res.json();
+        if (data.token) { localStorage.setItem(TOKEN_KEY, data.token); shareWithWorker(data.token); }
+        return data.token || null;
+      } catch { return null; }
+    }
+
+    function pushSupported() {
+      return window.isSecureContext
+        && 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window
+        && typeof Notification.requestPermission === 'function';
+    }
+
+    async function enablePush() {
+      const btn = document.getElementById('enable-btn');
+      const msg = document.getElementById('enable-msg');
+      btn.disabled = true; btn.textContent = 'Bezig…';
+      try {
+        if (!pushSupported()) throw new Error('Deze browser kan geen meldingen ontvangen. Open SpelBel in Safari of Chrome, of meld je aan via WhatsApp.');
+        const perm = await Notification.requestPermission();
+        if (perm !== 'granted') throw new Error('Je hebt meldingen geweigerd. Zet ze aan in de instellingen van je telefoon.');
+        const reg = await navigator.serviceWorker.register('/sw.js');
+        await navigator.serviceWorker.ready;
+        const sub = await reg.pushManager.subscribe({
+          userVisibleOnly: true, applicationServerKey: urlBase64ToUint8Array(VAPID_KEY),
+        });
+        const res = await fetch(API_BASE + '/webhook/subscribe/push', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ...sub.toJSON(), doorbellId: bellFromUrl || undefined }),
+        });
+        if (!res.ok) throw new Error(await res.text());
+        const data = await res.json();
+        token = data.token;
+        localStorage.setItem(TOKEN_KEY, token);
+        await shareWithWorker(token);
+        document.getElementById('enable').style.display = 'none';
+        load();
+      } catch (err) {
+        btn.disabled = false; btn.textContent = '🔔 Meldingen aanzetten';
+        msg.textContent = '❌ ' + err.message;
+        msg.className = 'msg msg-err'; msg.style.display = '';
+      }
+    }
+
+    async function showEnable() {
+      document.getElementById('loading').style.display = 'none';
+      const panel = document.getElementById('enable');
+      if (!pushSupported()) {
+        document.getElementById('enable-title').textContent = 'Meldingen niet beschikbaar';
+        document.getElementById('enable-sub').textContent =
+          'Deze browser kan geen meldingen ontvangen. Open SpelBel in Safari of Chrome, of meld je aan via WhatsApp bij de bel.';
+        document.getElementById('enable-btn').style.display = 'none';
+        panel.style.display = '';
+        return;
+      }
+      if (bellFromUrl) {
+        try {
+          const res = await fetch(`${API_BASE}/webhook/api/public/doorbells/${encodeURIComponent(bellFromUrl)}`);
+          if (res.ok) {
+            const bell = await res.json();
+            document.getElementById('enable-title').textContent = bell.name;
+            document.getElementById('enable-sub').textContent =
+              'Zet meldingen aan om te horen wanneer de bel gaat bij ' + bell.name + '.';
+          }
+        } catch { /* keep the generic wording */ }
+      }
+      panel.style.display = '';
+    }
 
     function showMsg(text, ok) {
       const el = document.getElementById('msg');
@@ -72,10 +196,23 @@
 
     async function load() {
       document.getElementById('loading').style.display = 'none';
-      if (!token) { document.getElementById('no-token').style.display = ''; return; }
+
+      if (!token) token = await recoverToken();
+      if (!token) {
+        // Nothing known about this device. If it arrived with a bell (fresh install from a
+        // bell page), offer to switch notifications on; otherwise explain the QR.
+        if (bellFromUrl || Notification?.permission !== 'denied') return showEnable();
+        document.getElementById('no-token').style.display = '';
+        return;
+      }
 
       const res = await fetch('{{APP_URL}}/webhook/push/settings?token=' + encodeURIComponent(token));
-      if (!res.ok) { document.getElementById('no-token').style.display = ''; localStorage.removeItem(TOKEN_KEY); return; }
+      if (!res.ok) {
+        localStorage.removeItem(TOKEN_KEY);
+        token = null;
+        return showEnable();
+      }
+      shareWithWorker(token);
 
       const data = await res.json();
       document.getElementById('content').style.display = '';

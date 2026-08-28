@@ -1,0 +1,22 @@
+name: Test
+
+on:
+  push:
+    branches: [main, staging]
+  pull_request:
+    branches: [main, staging]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: npm ci
+      # No build step by design; this checks the server file parses and runs the
+      # push-capability tests, which decide whether a parent is offered notifications.
+      - run: node --check src/index.js
+      - run: node --check public/sw.js
+      - run: npm test
