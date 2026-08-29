@@ -21,7 +21,8 @@
     .btn-snooze { background: #6366f1; color: #fff; border: none; border-radius: 8px; padding: 11px 20px; font-size: .9rem; cursor: pointer; width: 100%; margin-bottom: 8px; }
     .btn-snooze-day { background: #4f46e5; }
     .btn-unsub-all { background: #fff; color: #c53030; border: 1px solid #fca5a5; border-radius: 8px; padding: 11px 20px; font-size: .9rem; cursor: pointer; width: 100%; margin-top: 8px; }
-    .snooze-active { background: #fef3c7; border-color: #fcd34d; color: #92400e; border-radius: 8px; padding: 10px 14px; font-size: .9rem; margin-bottom: 12px; }
+    .snooze-active { background: #fef3c7; border-color: #fcd34d; color: #92400e; border-radius: 8px; padding: 10px 14px; font-size: .9rem; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    #snooze-undo { background: transparent; border: none; color: #92400e; font: inherit; font-weight: 700; text-decoration: underline; cursor: pointer; padding: 0; }
     .msg { border-radius: 8px; padding: 10px 14px; font-size: .9rem; margin-top: 12px; display: none; }
     .msg-ok  { background: #f0fff4; border: 1px solid #9ae6b4; color: #276749; }
     .msg-err { background: #fff5f5; border: 1px solid #feb2b2; color: #c53030; }
@@ -56,7 +57,10 @@
   </div>
 
   <div id="content" style="display:none">
-    <div id="snooze-active" class="snooze-active" style="display:none"></div>
+    <div id="snooze-active" class="snooze-active" style="display:none">
+      <span id="snooze-active-text"></span>
+      <button id="snooze-undo" onclick="resumeNotifications()">Hervatten</button>
+    </div>
 
     <div class="card">
       <h2>Mijn SpelBellen</h2>
@@ -220,9 +224,8 @@
       // Snooze banner
       if (data.snoozedUntil) {
         const time = new Date(data.snoozedUntil).toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Amsterdam' });
-        const el = document.getElementById('snooze-active');
-        el.textContent = `⏰ Meldingen gepauzeerd tot ${time}.`;
-        el.style.display = '';
+        document.getElementById('snooze-active-text').textContent = `⏰ Meldingen gepauzeerd tot ${time}.`;
+        document.getElementById('snooze-active').style.display = '';
       }
 
       // Bell list
@@ -249,10 +252,24 @@
       if (res.ok) {
         const data = await res.json();
         const time = new Date(data.until).toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Amsterdam' });
-        const el = document.getElementById('snooze-active');
-        el.textContent = `⏰ Meldingen gepauzeerd tot ${time}.`;
-        el.style.display = '';
+        document.getElementById('snooze-active-text').textContent = `⏰ Meldingen gepauzeerd tot ${time}.`;
+        document.getElementById('snooze-active').style.display = '';
         showMsg('✅ Gesnoozed!', true);
+      } else {
+        showMsg('❌ Er is iets misgegaan.', false);
+      }
+    }
+
+    // Snoozing is easy to do by accident — from a notification action, even — so undoing
+    // it has to be one tap away rather than a wait.
+    async function resumeNotifications() {
+      const res = await fetch('{{APP_URL}}/webhook/push/resume', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token }),
+      });
+      if (res.ok) {
+        document.getElementById('snooze-active').style.display = 'none';
+        showMsg('✅ Meldingen hervat.', true);
       } else {
         showMsg('❌ Er is iets misgegaan.', false);
       }
