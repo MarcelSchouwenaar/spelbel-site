@@ -400,6 +400,16 @@ function buildPushSection(doorbellId, vapidKey, appUrl, doorbellName) {
 
   // No push here: lead with the chat channels instead of a dead end. Opening the
   // disclosure is the whole point — for these parents it is the only way to subscribe.
+  // The inline script runs while the parser is still mid-document, so anything below it
+  // in the page does not exist yet — the channels disclosure most of all. Waiting once,
+  // here, fixes the whole class rather than the one symptom. F-001.
+  function domReady() {
+    if (document.readyState !== 'loading') return Promise.resolve();
+    return new Promise(function (resolve) {
+      document.addEventListener('DOMContentLoaded', resolve, { once: true });
+    });
+  }
+
   function fallbackToChannels(message) {
     $('push-btn').style.display = 'none';
     const why = document.querySelector('.push-why');
@@ -423,6 +433,7 @@ function buildPushSection(doorbellId, vapidKey, appUrl, doorbellName) {
   }
 
   (async function init() {
+    await domReady();
     track('bell_view');
     const support = await classifySupport();
 

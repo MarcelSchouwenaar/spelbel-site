@@ -219,3 +219,116 @@ test('no unreplaced placeholders survive into the page', () => {
     assert.equal(html.match(/\{\{[A-Z_]+\}\}/g), null);
     assert.ok(html.includes('https://a.example'), 'appUrl was not interpolated');
 });
+
+// ── The fallback must wait for the page to finish parsing ───────────────────
+// F-001. The inline script sits inside #push-section, and the channels disclosure is
+// emitted *after* it. An inline script blocks parsing while it runs, so the microtask
+// that resumes `await classifySupport()` gets there before the parser does: the
+// disclosure genuinely does not exist yet, querySelector returns null, and a parent on
+// a browser without push is told there is no other way to subscribe while WhatsApp sits
+// further down the same page. Staging could not catch it — with no chat credentials
+// configured, both branches render the same screen.
+
+/** Extracts the inline script exactly as the browser receives it. */
+function shippedScript() {
+    const src = fs.readFileSync(path.join(__dirname, '..', 'src', 'index.js'), 'utf8');
+    const start = src.indexOf('function buildPushSection(');
+    let depth = 0, i = src.indexOf('{', start);
+    for (; i < src.length; i++) {
+        if (src[i] === '{') depth++;
+        else if (src[i] === '}') { depth--; if (depth === 0) break; }
+    }
+    const context = { JSON };
+    vm.createContext(context);
+    const html = vm.runInContext(
+        `${src.slice(start, i + 1)}; buildPushSection('bell-1', 'key', 'https://app.example', 'Speeltuin Noord');`,
+        context
+    );
+    const m = html.match(/<script[^>]*>([\s\S]*?)<\/script>/);
+    assert.ok(m, 'no inline script in the generated markup');
+    return m[1];
+}
+
+function element(extra = {}) {
+    return {
+        style: {}, textContent: '', className: '', open: false, parentNode: null,
+        classList: { add() {}, remove() {}, contains() { return false; } },
+        addEventListener() {}, setAttribute() {}, appendChild() {},
+        insertBefore() {},
+        querySelector() { return null; },
+        ...extra,
+    };
+}
+
+/**
+ * A DuckDuckGo-shaped browser (no service worker → 'unsupported') on a page that is
+ * still parsing. `.other-channels` appears only when DOMContentLoaded fires, which is
+ * what the real parser does.
+ */
+function runPage({ channelsArrive = true } = {}) {
+    const summary = element({ textContent: 'Liever via WhatsApp, Telegram of Signal?' });
+    const note = element();
+    const details = element({
+        querySelector: sel => (sel === 'summary' ? summary : sel === '.other-channels-note' ? note : null),
+    });
+
+    const byId = {};
+    for (const id of ['push-btn', 'push-status', 'push-settings-link', 'push-section',
+                      'install-guide', 'install-intro', 'install-steps', 'install-btn', 'install-skip']) {
+        byId[id] = element();
+    }
+    byId['push-section'].parentNode = element();
+
+    let parsed = false;
+    const listeners = [];
+    const document = {
+        readyState: 'loading',
+        addEventListener: (type, fn) => { if (type === 'DOMContentLoaded') listeners.push(fn); },
+        getElementById: id => byId[id] || element(),
+        querySelector: sel => {
+            if (sel === '.other-channels') return parsed && channelsArrive ? details : null;
+            if (sel === '.push-why') return element();
+            return null;
+        },
+    };
+
+    const window = {
+        isSecureContext: true,
+        matchMedia: () => ({ matches: false }),
+        addEventListener() {},
+    };
+    const navigator = { userAgent: 'Mozilla/5.0 (Linux; Android 13) DuckDuckGo/5' };
+
+    const context = {
+        window, navigator, document, JSON, console,
+        fetch: () => Promise.resolve({ ok: true, json: () => Promise.resolve({}) }),
+        localStorage: { getItem: () => null, setItem() {} },
+        setTimeout, clearTimeout,
+    };
+    vm.createContext(context);
+    vm.runInContext(shippedScript(), context);
+
+    // Parsing finishes a tick later, exactly as it would in a browser.
+    return new Promise(resolve => {
+        setImmediate(() => {
+            parsed = true;
+            document.readyState = 'interactive';
+            listeners.forEach(fn => fn());
+            setImmediate(() => setImmediate(() => resolve({ details, summary, note, status: byId['push-status'] })));
+        });
+    });
+}
+
+test('a browser without push is offered the chat channels, not a dead end', async () => {
+    const { details, summary, status } = await runPage();
+    assert.equal(details.open, true, 'the channels disclosure was never opened');
+    assert.match(summary.textContent, /Meld je aan via WhatsApp/);
+    assert.doesNotMatch(status.textContent, /geen andere kanalen/,
+        'told the parent there is no other channel while WhatsApp was on the page');
+});
+
+test('a bell with no chat channels still says so', async () => {
+    // The message is only correct when it is true — that branch must survive the fix.
+    const { status } = await runPage({ channelsArrive: false });
+    assert.match(status.textContent, /geen andere kanalen/);
+});
