@@ -23,7 +23,7 @@
 
   <div class="content">
     <h2>Privacybeleid</h2>
-    <p class="updated">Laatst bijgewerkt: maart 2026</p>
+    <p class="updated">Laatst bijgewerkt: augustus 2026</p>
 
     <p>{{APP_NAME}} is een deurbelmeldingsdienst voor speeltuinen. Dit beleid legt uit welke gegevens we verzamelen, waarom, en hoe we ermee omgaan.</p>
 
@@ -35,25 +35,38 @@
       <li><strong>Telefoonnummer of berichtenhandle</strong> — verzameld wanneer je je aanmeldt via WhatsApp, Telegram of Signal. Dit is het gegeven dat we gebruiken om je meldingen te sturen.</li>
       <li><strong>Abonnementsgegevens</strong> — op welke deurbel(len) je geabonneerd bent.</li>
       <li><strong>Afmeldtoken</strong> — een willekeurig token gekoppeld aan je abonnement, meegestuurd in elke melding zodat je je kunt afmelden zonder in te loggen.</li>
+      <li><strong>Pushabonnement</strong> — als je meldingen ontvangt via je browser of via de SpelBel-app: een push-token van dat toestel, op welke bel(len) het toestel geabonneerd is, of meldingen tijdelijk gepauzeerd zijn, en het type platform (iOS, Android of web). Een push-token is een technische sleutel waarmee alleen dat ene toestel bereikt kan worden. Het bevat geen naam, telefoonnummer of e-mailadres, maar het is wel een gegeven dat aan jouw toestel gebonden is.</li>
       <li><strong>Gebeurtenissenlog</strong> — tijdstippen waarop een deurbel werd ingedrukt (niet gekoppeld aan individuele abonnees).</li>
+      <li><strong>Gebruiksstatistieken van de website</strong> — op de belpagina's tellen we hoe vaak een pagina bekeken wordt en of het aanmelden voor meldingen lukt of stukloopt. We slaan daarbij alleen de gebeurtenis, de bel, het type platform en het tijdstip op: geen IP-adres, geen cookie, geen identificatie van jou of je toestel. De SpelBel-app stuurt deze statistieken niet.</li>
     </ul>
 
     <h3>Wat we niet verzamelen</h3>
     <ul>
       <li>We verzamelen geen namen, e-mailadressen of locatiegegevens.</li>
       <li>We volgen geen gedrag buiten het aanmeld- en meldingsproces.</li>
-      <li>We gebruiken geen cookies of analytics.</li>
+      <li>We gebruiken geen cookies en geen externe analysediensten. De tellingen hierboven gebeuren op onze eigen server en zijn niet tot een persoon of toestel herleidbaar.</li>
+      <li>We verzamelen geen advertentie-identificatie, geen contacten en geen apparaatidentificatie buiten het push-token dat nodig is om je toestel te bereiken.</li>
       <li>We gebruiken gegevens niet voor advertenties.</li>
     </ul>
 
+    <h3>De SpelBel-app en meldingen in je browser</h3>
+    <p>Meldingen via je browser en via de SpelBel-app (iOS en Android) werken op dezelfde manier: je toestel meldt zich bij ons aan met een push-token, en wij sturen daar een bericht naartoe wanneer de bel gaat.</p>
+    <p>De app stuurt bij het aanmelden precies vier gegevens: het push-token, of het om de app of een browser gaat, het type toestel (iOS of Android), en welke bel je hebt gescand. Meer niet.</p>
+    <ul>
+      <li>De app kent geen account en geen inlog.</li>
+      <li>De camera wordt uitsluitend gebruikt om de QR-code bij een bel te lezen. Er worden geen foto's of beelden opgeslagen of verstuurd; de code wordt direct op je toestel verwerkt.</li>
+      <li>De app gebruikt geen locatiebepaling, leest je contacten niet, en bevat geen advertentie- of analysesoftware.</li>
+      <li>Verwijder je een bel uit de app, dan verwijderen wij het abonnement van dat toestel op die bel. Verwijder je de app of zet je meldingen uit, dan laat het platform ons weten dat het toestel niet meer bereikbaar is en verwijderen we het toestel uit onze database.</li>
+    </ul>
+
     <h3>Waarom we deze gegevens verzamelen</h3>
-    <p>Je telefoonnummer of handle wordt uitsluitend gebruikt om je een melding te sturen wanneer de deurbel waarop je geabonneerd bent wordt ingedrukt. Zonder dit gegeven kan de dienst niet functioneren.</p>
+    <p>Je telefoonnummer, handle of push-token wordt uitsluitend gebruikt om je een melding te sturen wanneer de deurbel waarop je geabonneerd bent wordt ingedrukt. Zonder dit gegeven kan de dienst niet functioneren. De gebruiksstatistieken gebruiken we alleen om te zien waar het aanmelden stukloopt, zodat we dat kunnen verbeteren.</p>
 
     <h3>Rechtsgrondslag</h3>
     <p>We verwerken je gegevens op basis van <strong>toestemming</strong> (AVG art. 6 lid 1 sub a). Je meldt je vrijwillig aan door een bericht naar de bot te sturen. Je kunt je toestemming op elk moment intrekken door je af te melden.</p>
 
     <h3>Bewaartermijn</h3>
-    <p>Je gegevens worden bewaard zolang je geabonneerd bent. Wanneer je je afmeldt (via de afmeldlink of door <em>stop</em> naar de bot te sturen), worden je telefoonnummer en abonnement uit onze database verwijderd. Gebeurtenislogs (tijdstippen van beldrukken) worden maximaal 90 dagen bewaard.</p>
+    <p>Je gegevens worden bewaard zolang je geabonneerd bent. Wanneer je je afmeldt (via de afmeldlink of door <em>stop</em> naar de bot te sturen), worden je telefoonnummer en abonnement uit onze database verwijderd. Een pushabonnement wordt verwijderd zodra je de laatste bel verwijdert, of zodra het platform ons meldt dat je toestel de app niet meer heeft. Gebeurtenislogs (tijdstippen van beldrukken) worden maximaal 90 dagen bewaard.</p>
 
     <h3>Derde partijen</h3>
     <p>Meldingen worden verstuurd via het berichtenplatform van jouw keuze. Je gegevens vallen onder hun privacybeleid:</p>
@@ -62,7 +75,15 @@
       <li><strong>Telegram</strong> — Telegram Messenger Inc.</li>
       <li><strong>Signal</strong> — Signal Foundation</li>
     </ul>
-    <p>We delen je gegevens niet met andere derde partijen.</p>
+    <p>Voor meldingen op je telefoon of in je browser gebruiken we:</p>
+    <ul>
+      <li><strong>Expo</strong> (Expo Push Service, 650 Industries, Inc.) — stuurt meldingen door naar de SpelBel-app</li>
+      <li><strong>Apple Push Notification service</strong> — Apple Inc., voor iPhones en iPads</li>
+      <li><strong>Firebase Cloud Messaging</strong> — Google LLC, voor Android-toestellen</li>
+    </ul>
+    <p>Deze partijen ontvangen het push-token van je toestel en de inhoud van de melding, dat wil zeggen de naam van de bel. Meldingen in je browser lopen via de pushdienst van de browser die je gebruikt (bijvoorbeeld die van Mozilla of Google), volgens dezelfde webstandaard.</p>
+    <p>De dienst draait op servers van <strong>Railway</strong>, met een database die gehost wordt door <strong>Neon</strong>. E-mail versturen we via <strong>Brevo</strong>.</p>
+    <p>We delen je gegevens niet met andere derde partijen, en we verkopen ze niet.</p>
 
     <h3>Gegevensbeveiliging</h3>
     <p>Gegevens worden opgeslagen in een gehoste PostgreSQL-database. Toegang tot de database en het beheerpaneel is beveiligd met geheime tokens. De server past HTTPS en standaard beveiligingsheaders toe.</p>
