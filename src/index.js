@@ -182,7 +182,8 @@ function buildPushSection(doorbellId, vapidKey, appUrl, doorbellName) {
   </div>
 
   <div id="push-status" style="display:none"></div>
-  <a href="${appUrl}/app" id="push-settings-link" style="display:none">⚙️ Meldingsinstellingen →</a>
+  <!-- /app is served by this site, not by the API host that appUrl points at. -->
+  <a href="/app" id="push-settings-link" style="display:none">⚙️ Meldingsinstellingen →</a>
 </div>
 <script>
 (function() {

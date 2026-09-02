@@ -332,3 +332,31 @@ test('a bell with no chat channels still says so', async () => {
     const { status } = await runPage({ channelsArrive: false });
     assert.match(status.textContent, /geen andere kanalen/);
 });
+
+// ── Page links must not be built from the API host ──────────────────────────
+// F-006. `appUrl` is the API base — the server that receives subscriptions. The pages a
+// parent navigates to (/app, /push/settings) are served by *this* site. Building a link
+// from appUrl sends them to the API host, which has no such route: a 404 reached by
+// clicking the one control that leads to the snooze settings.
+
+test('the settings link points at this site, not the API host', () => {
+    const src = fs.readFileSync(path.join(__dirname, '..', 'src', 'index.js'), 'utf8');
+    const start = src.indexOf('function buildPushSection(');
+    let depth = 0, i = src.indexOf('{', start);
+    for (; i < src.length; i++) {
+        if (src[i] === '{') depth++;
+        else if (src[i] === '}') { depth--; if (depth === 0) break; }
+    }
+    const context = { JSON };
+    vm.createContext(context);
+    const html = vm.runInContext(
+        `${src.slice(start, i + 1)}; buildPushSection('b', 'k', 'https://api.example', 'Naam');`,
+        context
+    );
+
+    for (const m of html.matchAll(/<a\s[^>]*href="([^"]+)"/g)) {
+        assert.doesNotMatch(m[1], /^https:\/\/api\.example/,
+            `navigable link built from the API host: ${m[1]}`);
+    }
+    assert.match(html, /id="push-settings-link"/, 'the settings link disappeared');
+});
