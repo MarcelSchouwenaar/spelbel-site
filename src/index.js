@@ -216,11 +216,16 @@ function buildPushSection(doorbellId, vapidKey, appUrl, doorbellName) {
 
   async function classifySupport() {
     if (!window.isSecureContext) return 'unsupported';
+    // This must come before the capability checks, not after. Outside a home-screen app,
+    // iOS exposes neither Notification nor PushManager at all — so every iPhone in a
+    // Safari tab would be called 'unsupported' and sent to the chat channels, and the
+    // install guide written for exactly this case would never run. Only Safari can add to
+    // the home screen; Chrome, Firefox and DuckDuckGo on iOS genuinely cannot, and for
+    // them 'unsupported' is the truth.
+    if (isIOS && !isStandalone) return isSafari ? 'needs-install' : 'unsupported';
     if (!('serviceWorker' in navigator) || !('PushManager' in window) || !('Notification' in window)) return 'unsupported';
     if (typeof Notification.requestPermission !== 'function') return 'unsupported';
     if (Notification.permission === 'denied') return 'blocked';
-    // iOS refuses permission outside a home-screen app, so installing comes first.
-    if (isIOS && !isStandalone) return 'needs-install';
     try {
       const reg = await navigator.serviceWorker.register('/sw.js');
       // Some browsers expose PushManager on window but not on a registration.
@@ -308,7 +313,7 @@ function buildPushSection(doorbellId, vapidKey, appUrl, doorbellName) {
 
   const GUIDES = {
     'ios-install': {
-      intro: '<strong>Nog één stap.</strong> Op de iPhone werken meldingen alleen als je SpelBel op je beginscherm zet:',
+      intro: '<strong>Zet deze bel op je beginscherm om meldingen te ontvangen.</strong> Op de iPhone werkt het alleen zo:',
       steps: ['Tik op <strong>Deel</strong> <span class="ios-icon">⬆️</span> onderin je scherm',
               'Kies <strong>Zet op beginscherm</strong>',
               'Open SpelBel vanaf je beginscherm en zet meldingen aan'],
@@ -446,6 +451,12 @@ function buildPushSection(doorbellId, vapidKey, appUrl, doorbellName) {
     if (support === 'blocked') {
       track('push_blocked');
       fallbackToChannels('Meldingen staan geblokkeerd voor deze site. Zet ze aan in je browserinstellingen en ververs de pagina.');
+      return;
+    }
+    // iOS Safari, not yet installed. Say so straight away rather than behind a button:
+    // tapping it cannot lead anywhere until the bell is on the home screen.
+    if (support === 'needs-install') {
+      showInstallGuide('ios-install');
       return;
     }
 

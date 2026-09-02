@@ -40,6 +40,7 @@ function run(overrides = {}) {
         requestPermission: () => Promise.resolve('granted'),
         permission: 'default',
         isIOS: false,
+        isSafari: true,
         isStandalone: false,
         register: () => Promise.resolve({ pushManager: {} }),
         ...overrides,
@@ -52,6 +53,7 @@ function run(overrides = {}) {
         window: { isSecureContext: env.isSecureContext },
         navigator,
         isIOS: env.isIOS,
+        isSafari: env.isSafari,
         isStandalone: env.isStandalone,
     };
     if (env.hasPushManager) context.window.PushManager = function () {};
@@ -113,8 +115,32 @@ test('a blocked site is reported as blocked, not unsupported', async () => {
     assert.equal(await run({ permission: 'denied' }), 'blocked');
 });
 
-test('blocked is decided before the iOS install rule', async () => {
-    assert.equal(await run({ permission: 'denied', isIOS: true, isStandalone: false }), 'blocked');
+test('an installed iOS app with permission denied is blocked, not sent to install again', async () => {
+    // Denial is only reachable once installed: a Safari tab has no Notification API to deny.
+    assert.equal(await run({ permission: 'denied', isIOS: true, isStandalone: true }), 'blocked');
+});
+
+// ── iOS as it really behaves ────────────────────────────────────────────────
+// F-007. Outside a home-screen app, iOS exposes neither Notification nor PushManager.
+// The capability checks therefore have to run *after* the iOS rule, or every iPhone is
+// classified unsupported and the install guide written for it never runs.
+
+test('iOS Safari with no push APIs is told to install, not that it cannot', async () => {
+    assert.equal(
+        await run({ isIOS: true, isSafari: true, isStandalone: false,
+                    hasPushManager: false, hasNotification: false }),
+        'needs-install');
+});
+
+test('Chrome and DuckDuckGo on iOS are unsupported — they cannot install at all', async () => {
+    assert.equal(
+        await run({ isIOS: true, isSafari: false, isStandalone: false,
+                    hasPushManager: false, hasNotification: false }),
+        'unsupported');
+});
+
+test('an installed iOS app is judged on capabilities, not on being iOS', async () => {
+    assert.equal(await run({ isIOS: true, isSafari: true, isStandalone: true }), 'ready');
 });
 
 // ── Install policy ──────────────────────────────────────────────────────────
