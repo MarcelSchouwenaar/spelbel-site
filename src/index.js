@@ -131,6 +131,20 @@ app.get('/bel/:id', async (req, res) => {
         }
         const doorbell = await apiRes.json();
 
+        // A pre-printed bell whose LoRa device is not fitted yet. Scanning it in the workshop
+        // (or by whoever finds the box) must not offer a subscription that will never ring.
+        if (doorbell.status === 'unclaimed') {
+            return res.send(render('bell.html', {
+                APP_NAME,
+                MANIFEST_HREF: '/manifest.webmanifest',
+                DOORBELL_NAME: 'Deze bel is nog niet in gebruik',
+                LOCATION: '',
+                OTHER_CHANNELS: '',
+                EMPTY: '<p class="empty">Deze bel is nog niet geïnstalleerd. Kom terug zodra hij hangt — dan kun je je hier aanmelden voor meldingen.</p>',
+                PUSH_SECTION: '',
+            }));
+        }
+
         const loc = doorbell.location ? `<p class="location">📍 ${doorbell.location}</p>` : '';
 
         // Chat channels move behind a disclosure: every WhatsApp notification costs money
