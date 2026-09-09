@@ -354,6 +354,15 @@ header .logo img { width: 200px; height: auto; }
 .about p { text-align: center; }
 .about a { color: inherit; text-decoration: underline; }
 
+.nieuwsbrief { padding: 56px 24px; background: #DD4A93; }
+.nieuwsbrief-inner { max-width: 560px; margin: 0 auto; text-align: center; }
+.nieuwsbrief h3 { font-family: 'Tomarik', sans-serif; font-size: 2rem; color: #fff; margin-bottom: 12px; }
+.nieuwsbrief p { color: #fff; margin-bottom: 28px; font-size: 1rem; }
+.nieuwsbrief-form { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+.nieuwsbrief-form input[type="email"] { flex: 1; min-width: 220px; padding: 14px 20px; border: none; border-radius: 16px; font-family: 'Hanken Grotesk', sans-serif; font-size: 1rem; outline: none; }
+.nieuwsbrief-form .btn-nw { background: #d4f04c; color: #000; border: none; cursor: pointer; font-size: 18px; padding: 14px 28px; }
+.nieuwsbrief-melding { margin-top: 16px; color: #fff; font-weight: 600; min-height: 24px; }
+
 footer {
   padding: 40px 24px;
   text-align: center;

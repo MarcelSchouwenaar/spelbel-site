@@ -19,6 +19,15 @@ async function init() {
         );
     `);
     await pool.query(`
+        CREATE TABLE IF NOT EXISTS newsletter_tokens (
+            id SERIAL PRIMARY KEY,
+            email TEXT NOT NULL,
+            token TEXT UNIQUE NOT NULL,
+            verified_at TIMESTAMPTZ,
+            created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+        );
+    `);
+    await pool.query(`
         CREATE TABLE IF NOT EXISTS signups (
             id SERIAL PRIMARY KEY,
             location_id INTEGER NOT NULL REFERENCES locations(id) ON DELETE CASCADE,

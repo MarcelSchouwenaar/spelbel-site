@@ -84,6 +84,45 @@ function buildVerificationEmailHtml({ naam, plekNaam, verifyUrl }) {
 </html>`;
 }
 
+async function sendNewsletterVerificationEmail({ email, verifyUrl }) {
+    const apiKey = process.env.BREVO_API_KEY;
+    const sender = process.env.SENDER_EMAIL;
+    if (!apiKey || !sender) return;
+
+    await fetch('https://api.brevo.com/v3/smtp/email', {
+        method: 'POST',
+        headers: { 'api-key': apiKey, 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify({
+            sender: { email: sender, name: 'SpelBel' },
+            to: [{ email }],
+            subject: '🔔 Bevestig je nieuwsbrief-aanmelding',
+            htmlContent: `<!DOCTYPE html>
+<html lang="nl"><head><meta charset="UTF-8"></head>
+<body style="margin:0;padding:0;background:#ffffff;font-family:Arial,Helvetica,sans-serif;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#ffffff;padding:40px 16px;">
+    <tr><td align="center">
+      <table role="presentation" width="100%" style="max-width:480px;background:#ffffff;border-radius:24px;overflow:hidden;border:1px solid #E2E6E5;">
+        <tr><td style="padding:32px 32px 24px;text-align:center;border-bottom:1px solid #E2E6E5;">
+          <img src="https://www.spelbel.nl/images/logo.svg" alt="SpelBel" style="height:48px;">
+        </td></tr>
+        <tr><td style="padding:36px 32px 8px;">
+          <p style="margin:0 0 16px;font-size:16px;line-height:1.6;color:#1A1A1A;">Hoi!</p>
+          <p style="margin:0 0 24px;font-size:16px;line-height:1.6;color:#1A1A1A;">Klik op de knop om je aanmelding voor de SpelBel nieuwsbrief te bevestigen.</p>
+        </td></tr>
+        <tr><td align="center" style="padding:0 32px 32px;">
+          <a href="${verifyUrl}" style="display:inline-block;background:#DD4A93;color:#ffffff;text-decoration:none;font-size:18px;font-weight:bold;padding:14px 36px;border-radius:99px;">Bevestig aanmelding</a>
+        </td></tr>
+        <tr><td style="background:#F4F6F5;padding:20px 32px;text-align:center;">
+          <p style="margin:0;font-size:12px;color:#5A6360;">Heb je dit niet aangevraagd? Dan kun je deze e-mail negeren.</p>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body></html>`,
+        }),
+    }).catch(err => console.error('[Email] sendNewsletterVerificationEmail failed:', err.message));
+}
+
 async function sendOwnerNotificationEmail({ naam, email, plekNaam, plaats, mapsUrl, mapUrl }) {
     const apiKey = process.env.BREVO_API_KEY;
     const sender = process.env.SENDER_EMAIL;
@@ -174,7 +213,7 @@ async function sendWelcomeEmail({ naam, email }) {
     }).catch(err => console.error('[Email] sendWelcomeEmail failed:', err.message));
 }
 
-async function addToMailingList({ email, naam }) {
+async function addToMailingList({ email, naam, bron = 'kaart_geverifieerd' }) {
     const apiKey = process.env.BREVO_API_KEY;
     if (!apiKey) return;
 
@@ -183,11 +222,11 @@ async function addToMailingList({ email, naam }) {
         headers: { 'api-key': apiKey, 'Content-Type': 'application/json', 'Accept': 'application/json' },
         body: JSON.stringify({
             email,
-            attributes: { FIRSTNAME: naam, BRON: 'kaart_geverifieerd' },
+            attributes: { FIRSTNAME: naam, BRON: bron },
             listIds: [5],
             updateEnabled: true,
         }),
     }).catch(err => console.error('[Email] addToMailingList failed:', err.message));
 }
 
-module.exports = { sendVerificationEmail, sendOwnerNotificationEmail, addToMailingList, sendWelcomeEmail };
+module.exports = { sendVerificationEmail, sendNewsletterVerificationEmail, sendOwnerNotificationEmail, addToMailingList, sendWelcomeEmail };

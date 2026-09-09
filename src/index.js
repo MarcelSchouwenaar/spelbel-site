@@ -5,7 +5,7 @@ const fetch = require('node-fetch');
 const path = require('path');
 const { render } = require('./lib/render');
 const { pool, init: initDb } = require('./lib/db');
-const { sendVerificationEmail, sendOwnerNotificationEmail, addToMailingList, sendWelcomeEmail } = require('./lib/email');
+const { sendVerificationEmail, sendNewsletterVerificationEmail, sendOwnerNotificationEmail, addToMailingList, sendWelcomeEmail } = require('./lib/email');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -639,6 +639,45 @@ app.get('/api/verify/:token', async (req, res) => {
     } catch (err) {
         console.error('[API] /api/verify error:', err.message);
         res.redirect('/wij-willen-een-spelbel?bevestigd=0');
+    }
+});
+
+// Newsletter signup from homepage — sends verification email
+app.post('/api/newsletter', async (req, res) => {
+    const { email } = req.body || {};
+    if (!email || !email.includes('@')) return res.status(400).json({ error: 'Ongeldig e-mailadres.' });
+    try {
+        const token = crypto.randomBytes(32).toString('hex');
+        await pool.query(
+            `INSERT INTO newsletter_tokens (email, token) VALUES ($1, $2)
+             ON CONFLICT DO NOTHING`,
+            [email.toLowerCase(), token]
+        );
+        const verifyUrl = `${APP_URL}/api/newsletter/verify/${token}`;
+        await sendNewsletterVerificationEmail({ email, verifyUrl });
+        res.json({ ok: true });
+    } catch (err) {
+        console.error('[API] /api/newsletter error:', err.message);
+        res.status(500).json({ error: 'Aanmelden mislukt.' });
+    }
+});
+
+// Newsletter verification link
+app.get('/api/newsletter/verify/:token', async (req, res) => {
+    try {
+        const { rows } = await pool.query(
+            `UPDATE newsletter_tokens SET verified_at = now()
+             WHERE token = $1 AND verified_at IS NULL RETURNING email`,
+            [req.params.token]
+        );
+        if (rows[0]) {
+            await addToMailingList({ email: rows[0].email, naam: '', bron: 'homepage' });
+            await sendWelcomeEmail({ naam: '', email: rows[0].email });
+        }
+        res.redirect('/?nieuwsbrief=bevestigd');
+    } catch (err) {
+        console.error('[API] /api/newsletter/verify error:', err.message);
+        res.redirect('/');
     }
 });
 
