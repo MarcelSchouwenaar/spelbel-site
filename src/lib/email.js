@@ -123,7 +123,7 @@ async function sendNewsletterVerificationEmail({ email, verifyUrl }) {
     }).catch(err => console.error('[Email] sendNewsletterVerificationEmail failed:', err.message));
 }
 
-async function sendOwnerNotificationEmail({ naam, email, plekNaam, plaats, mapsUrl, mapUrl }) {
+async function sendOwnerNotificationEmail({ naam, email, plekNaam, plaats, mapsUrl, mapUrl, aanmeldingen }) {
     const apiKey = process.env.BREVO_API_KEY;
     const sender = process.env.SENDER_EMAIL;
     const notify = process.env.CONTACT_EMAIL;
@@ -147,7 +147,8 @@ async function sendOwnerNotificationEmail({ naam, email, plekNaam, plaats, mapsU
         <tr><td style="padding:32px 32px 8px;">
           <p style="margin:0 0 12px;font-size:16px;color:#1A1A1A;"><strong>${naam}</strong> (${email}) heeft zich aangemeld bij:</p>
           <p style="margin:0 0 8px;font-size:20px;font-weight:bold;color:#DD4A93;">📍 ${plekNaam}</p>
-          ${plaats ? `<p style="margin:0 0 24px;font-size:14px;color:#5A6360;">${plaats}</p>` : '<p style="margin:0 0 24px;"></p>'}
+          ${plaats ? `<p style="margin:0 0 8px;font-size:14px;color:#5A6360;">${plaats}</p>` : ''}
+          <p style="margin:0 0 24px;font-size:15px;color:#1A1A1A;">Totaal aanmeldingen op deze plek: <strong>${aanmeldingen}</strong></p>
         </td></tr>
         <tr><td align="center" style="padding:0 32px 16px;">
           ${mapsUrl ? `<a href="${mapsUrl}" style="display:inline-block;background:#1A1A1A;color:#ffffff;text-decoration:none;font-size:16px;font-weight:bold;padding:12px 28px;border-radius:99px;margin-bottom:10px;">📍 Open in Google Maps</a><br>` : ''}

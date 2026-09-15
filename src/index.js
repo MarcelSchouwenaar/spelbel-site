@@ -624,13 +624,21 @@ app.get('/api/verify/:token', async (req, res) => {
                 sendWelcomeEmail({ naam, email }).catch(() => {});
             }
             // Send owner notification (fire-and-forget)
-            pool.query('SELECT naam, plaats, lat, lng FROM locations WHERE id = $1', [location_id])
+            pool.query(
+                    `SELECT l.naam, l.plaats, l.lat, l.lng,
+                            COUNT(s.id) FILTER (WHERE s.verified_at IS NOT NULL) AS aanmeldingen
+                     FROM locations l
+                     LEFT JOIN signups s ON s.location_id = l.id
+                     WHERE l.id = $1
+                     GROUP BY l.id`,
+                    [location_id]
+                )
                 .then(({ rows: locs }) => {
                     const loc = locs[0];
                     const plekNaam = loc?.naam || 'onbekende plek';
                     const mapsUrl = loc ? `https://maps.google.com/maps?q=${loc.lat},${loc.lng}` : null;
                     const mapUrl = `https://www.spelbel.nl/wij-willen-een-spelbel`;
-                    sendOwnerNotificationEmail({ naam, email, plekNaam, plaats: loc?.plaats, mapsUrl, mapUrl });
+                    sendOwnerNotificationEmail({ naam, email, plekNaam, plaats: loc?.plaats, mapsUrl, mapUrl, aanmeldingen: parseInt(loc?.aanmeldingen || 0) });
                 })
                 .catch(() => {});
             return res.redirect(`/wij-willen-een-spelbel?bevestigd=1&locatie=${location_id}`);
