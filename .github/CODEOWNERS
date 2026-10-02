@@ -1,0 +1,5 @@
+# The parent pages (bell page, settings, service worker) are relayed to the app by
+# src/proxy.js. A broken rule there silently stops notifications for every parent,
+# so changes to it need the app team's review. See playbell/docs/11-parent-pages-behind-www.md.
+/src/proxy.js        @MarcelSchouwenaar
+/test/proxy.test.js  @MarcelSchouwenaar
