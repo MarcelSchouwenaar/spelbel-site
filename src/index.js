@@ -4,6 +4,7 @@ const express = require('express');
 const fetch = require('node-fetch');
 const path = require('path');
 const { render } = require('./lib/render');
+const { parentPagesProxy } = require('./proxy');
 const { pool, init: initDb } = require('./lib/db');
 const { sendVerificationEmail, sendNewsletterVerificationEmail, sendOwnerNotificationEmail, addToMailingList, sendWelcomeEmail } = require('./lib/email');
 
@@ -16,6 +17,15 @@ const APP_URL = (process.env.APP_URL || '').replace(/\/$/, '');
 const INTERNAL_API_URL = (process.env.INTERNAL_API_URL || APP_URL).replace(/\/$/, '');
 const APP_NAME = process.env.APP_NAME || 'SpelBel';
 const CLUSTER_AFSTAND = 0.003;
+
+// Railway's edge is the one hop in front of us: req.ip is then the real client.
+app.set('trust proxy', 1);
+
+// Parent pages are rendered by the app and relayed from here — first, before static files
+// and the staging banner (the app adds its own). Off: this site serves its own copies.
+if (process.env.PROXY_PARENT_PAGES === 'true') {
+    app.use(parentPagesProxy(INTERNAL_API_URL));
+}
 
 app.use(express.json());
 
