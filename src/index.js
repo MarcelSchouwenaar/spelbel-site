@@ -23,7 +23,8 @@ app.set('trust proxy', 1);
 // Parent pages — the bell page, settings, manifest, service worker — are rendered by the
 // app and relayed from here (src/proxy.js). First, before static files and the staging
 // banner: the app adds its own.
-app.use(parentPagesProxy(INTERNAL_API_URL));
+if (INTERNAL_API_URL) app.use(parentPagesProxy(INTERNAL_API_URL));
+else console.warn('[Site] No INTERNAL_API_URL or APP_URL — the parent pages (/bel, /app, …) will 404 locally.');
 
 app.use(express.json());
 
