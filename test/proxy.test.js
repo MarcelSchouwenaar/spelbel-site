@@ -12,9 +12,9 @@ const express = require('express');
 const { parentPagesProxy, isParentRoute } = require('../src/proxy');
 
 test('routes exactly the parent paths to the app', () => {
-    const forwarded = ['/bel/abc', '/bel/12', '/app', '/push/settings', '/push-demo',
+    const forwarded = ['/bel/abc', '/bel/12', '/app', '/push/settings',
         '/manifest.webmanifest', '/sw.js', '/app-assets/css/parent.css', '/app-assets/images/logo.svg'];
-    const kept = ['/', '/privacy', '/thankyou', '/wij-willen-een-spelbel', '/api/signups',
+    const kept = ['/', '/privacy', '/push-demo', '/thankyou', '/wij-willen-een-spelbel', '/api/signups',
         '/bel', '/bel/', '/bel/abc/extra', '/apple', '/app/', '/application', '/sw.js.map',
         '/push', '/push/settings/x', '/css/app.css', '/images/logo.svg', '/app-assets'];
     for (const p of forwarded) assert.ok(isParentRoute(p), `${p} should go to the app`);

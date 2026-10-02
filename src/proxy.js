@@ -12,7 +12,6 @@ const PARENT_ROUTES = [
     /^\/bel\/[^/]+$/,
     /^\/app$/,
     /^\/push\/settings$/,
-    /^\/push-demo$/,
     /^\/manifest\.webmanifest$/,
     /^\/sw\.js$/,
     /^\/app-assets\//,
