@@ -16,6 +16,7 @@ const PARENT_ROUTES = [
     /^\/manifest\.webmanifest$/,
     /^\/sw\.js$/,
     /^\/app-assets\//,
+    /^\/_expo\//,          // the parent app's web build (playbell plan 15)
 ];
 
 const isParentRoute = (p) => PARENT_ROUTES.some((r) => r.test(p));
