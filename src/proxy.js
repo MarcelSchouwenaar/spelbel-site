@@ -16,6 +16,9 @@ const PARENT_ROUTES = [
     /^\/sw\.js$/,
     /^\/app-assets\//,
     /^\/_expo\//,          // the parent app's web build (playbell plan 15)
+    // Bell links open the native app (playbell plan 17): iOS and Android fetch these from www.
+    /^\/\.well-known\/apple-app-site-association$/,
+    /^\/\.well-known\/assetlinks\.json$/,
 ];
 
 const isParentRoute = (p) => PARENT_ROUTES.some((r) => r.test(p));
