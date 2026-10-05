@@ -14,10 +14,12 @@ const { parentPagesProxy, isParentRoute } = require('../src/proxy');
 test('routes exactly the parent paths to the app', () => {
     const forwarded = ['/bel/abc', '/bel/12', '/app', '/push/settings', '/push-demo',
         '/manifest.webmanifest', '/sw.js', '/app-assets/css/parent.css', '/app-assets/images/logo.svg',
-        '/_expo/static/js/web/entry-62d27081.js'];
+        '/_expo/static/js/web/entry-62d27081.js',
+        '/.well-known/apple-app-site-association', '/.well-known/assetlinks.json'];
     const kept = ['/', '/privacy', '/thankyou', '/wij-willen-een-spelbel', '/api/signups',
         '/bel', '/bel/', '/bel/abc/extra', '/apple', '/app/', '/application', '/sw.js.map',
-        '/push', '/push/settings/x', '/css/app.css', '/images/logo.svg', '/app-assets', '/_expo', '/expo/x.js'];
+        '/push', '/push/settings/x', '/css/app.css', '/images/logo.svg', '/app-assets', '/_expo', '/expo/x.js',
+        '/.well-known/security.txt', '/.well-known/', '/.well-known/assetlinks.json.bak'];
     for (const p of forwarded) assert.ok(isParentRoute(p), `${p} should go to the app`);
     for (const p of kept) assert.ok(!isParentRoute(p), `${p} should stay on the site`);
 });
