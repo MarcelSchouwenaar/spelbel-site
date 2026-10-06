@@ -43,4 +43,17 @@ async function init() {
     `);
 }
 
-module.exports = { pool, init };
+/**
+ * Keep data only as long as the privacy policy says. Signups via the map: at most three years
+ * (earlier by hand, once a bell hangs there). Newsletter confirmation tokens: 30 days — the
+ * list itself lives at Brevo, until someone unsubscribes.
+ */
+async function purgeOld() {
+    const signups = await pool.query("DELETE FROM signups WHERE created_at < now() - interval '3 years'");
+    const tokens = await pool.query("DELETE FROM newsletter_tokens WHERE created_at < now() - interval '30 days'");
+    if (signups.rowCount || tokens.rowCount) {
+        console.log(`[DB] Removed ${signups.rowCount} signup(s) older than 3 years, ${tokens.rowCount} newsletter token(s) older than 30 days`);
+    }
+}
+
+module.exports = { pool, init, purgeOld };
