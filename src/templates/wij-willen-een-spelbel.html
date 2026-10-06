@@ -236,7 +236,7 @@
 <footer>
   <div class="footer-logo">🔔 Spel Bel</div>
   <p>Spel Bel is een initiatief van <a href="https://www.scrollscrollscroll.nl" target="_blank">ScrollScrollScroll</a>, ontwerpstudio uit Rotterdam.<br>
-  <a href="mailto:info@scrollscrollscroll.nl">info@scrollscrollscroll.nl</a> &middot; <a href="/">www.spelbel.nl</a></p>
+  <a href="mailto:info@scrollscrollscroll.nl">info@scrollscrollscroll.nl</a> &middot; <a href="/">www.spelbel.nl</a><br><a href="{{APP_URL}}/auth/login">Inloggen beheerders</a></p>
 </footer>
 
 <div class="paneel-overlay" id="paneel-overlay" onclick="if(event.target===this)sluitPaneel()">
@@ -367,8 +367,8 @@ function openFormulier(bestaand, lat, lng) {
     <div class="veld"><label for="naam">Jouw naam</label><input type="text" id="naam" placeholder="Bv. Sanne de Boer" autocomplete="name"></div>
     <div class="veld"><label for="email">E-mailadres</label><input type="email" id="email" placeholder="sanne@voorbeeld.nl" autocomplete="email"></div>
     ${plekNaamVeld}
-    <label class="checkbox-rij"><input type="checkbox" id="openbaar" checked><span>Mijn naam mag zichtbaar zijn bij deze speelplek (anders blijf je anoniem)</span></label>
-    <label class="checkbox-rij"><input type="checkbox" id="nieuwsbrief" checked><span>Houd mij op de hoogte van het Spel Bel-avontuur</span></label>
+    <label class="checkbox-rij"><input type="checkbox" id="openbaar"><span>Mijn naam mag zichtbaar zijn bij deze speelplek (anders blijf je anoniem)</span></label>
+    <label class="checkbox-rij"><input type="checkbox" id="nieuwsbrief"><span>Houd mij op de hoogte van het Spel Bel-avontuur</span></label>
     <button class="verstuur-knop" onclick="aanmelden()">🔔 Ik wil een Spel Bel!</button>`;
   openPaneel();
 }
