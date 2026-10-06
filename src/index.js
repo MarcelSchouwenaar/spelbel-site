@@ -4,7 +4,7 @@ const express = require('express');
 const path = require('path');
 const { render } = require('./lib/render');
 const { parentPagesProxy } = require('./proxy');
-const { pool, init: initDb } = require('./lib/db');
+const { pool, init: initDb, purgeOld } = require('./lib/db');
 const { sendVerificationEmail, sendNewsletterVerificationEmail, sendOwnerNotificationEmail, addToMailingList, sendWelcomeEmail } = require('./lib/email');
 
 const app = express();
@@ -58,6 +58,11 @@ app.use(express.static(path.join(__dirname, '..', 'public')));
 
 initDb().catch(err => console.error('[DB] init failed:', err.message));
 
+// What the privacy policy promises about keeping data, done: daily, and once after start-up.
+const runPurge = () => purgeOld().catch(err => console.error('[DB] purge failed:', err.message));
+setTimeout(runPurge, 30_000);
+setInterval(runPurge, 24 * 60 * 60 * 1000).unref();
+
 // Homepage
 app.get('/', (req, res) => {
     const [emailUser, emailDomain] = (process.env.CONTACT_EMAIL || '@').split('@');
@@ -80,7 +85,8 @@ app.get('/thankyou', (req, res) => {
 
 // Privacy policy
 app.get('/privacy', (req, res) => {
-    res.send(render('privacy.html', { APP_NAME }));
+    const [emailUser, emailDomain] = (process.env.CONTACT_EMAIL || '@').split('@');
+    res.send(render('privacy.html', { APP_NAME, CONTACT_EMAIL_USER: emailUser, CONTACT_EMAIL_DOMAIN: emailDomain }));
 });
 
 // Wij willen een SpelBel — list locations with verified signups
