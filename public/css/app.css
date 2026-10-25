@@ -445,6 +445,26 @@ body.privacy-page { line-height: 1.7; }
 .content ul li { margin-bottom: 6px; }
 .content a { color: #111; }
 
+/* ── Manuals ───────────────────────────────────────────── */
+.manual-page .content { max-width: 760px; }
+.content h4 { font-weight: 700; margin: 20px 0 6px; }
+.content ol.steps-list { margin: 0 0 12px 22px; }
+.content ol.steps-list li { margin-bottom: 6px; }
+.toc { background: #ABE4FF; border: 3px solid #000; border-radius: 22px; box-shadow: 6px 6px 0 #000; padding: 16px 24px; margin-bottom: 32px; }
+.toc ol { margin: 0 0 0 20px; }
+.toc a { text-decoration: none; }
+.content figure { margin: 16px 0 24px; }
+.content figure img { width: 100%; height: auto; display: block; border: 2px solid #000; border-radius: 14px; box-shadow: 4px 4px 0 #000; }
+.content figcaption { font-size: .85rem; color: #666; margin-top: 8px; text-align: center; }
+.content figure.phone, .shots figure { max-width: 300px; }
+.content figure.phone { margin-left: auto; margin-right: auto; }
+.shots { display: flex; flex-wrap: wrap; justify-content: center; gap: 24px; }
+.shots figure { flex: 1 1 220px; margin: 16px 0 24px; }
+.manual-table { width: 100%; border-collapse: collapse; margin: 8px 0 16px; font-size: .95rem; }
+.manual-table th, .manual-table td { text-align: left; vertical-align: top; padding: 8px 10px; border-bottom: 1px solid #ddd; }
+.manual-table th { font-weight: 700; }
+.content code { background: #f2f2f2; border-radius: 6px; padding: 1px 6px; font-size: .9em; }
+
 @media screen and (max-width: 1024px) {
   .hero { background-size: auto 100%; background-position: center center; }
 }
