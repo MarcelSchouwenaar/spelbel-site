@@ -5,7 +5,8 @@ const path = require('path');
 const { render } = require('./lib/render');
 const { parentPagesProxy } = require('./proxy');
 const { pool, init: initDb, purgeOld } = require('./lib/db');
-const { sendVerificationEmail, sendNewsletterVerificationEmail, sendOwnerNotificationEmail, addToMailingList, sendWelcomeEmail } = require('./lib/email');
+const multer = require('multer');
+const { sendVerificationEmail, sendNewsletterVerificationEmail, sendOwnerNotificationEmail, addToMailingList, sendWelcomeEmail, sendBelbaasEmail } = require('./lib/email');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -87,6 +88,43 @@ app.get('/thankyou', (req, res) => {
 app.get('/privacy', (req, res) => {
     const [emailUser, emailDomain] = (process.env.CONTACT_EMAIL || '@').split('@');
     res.send(render('privacy.html', { APP_NAME, CONTACT_EMAIL_USER: emailUser, CONTACT_EMAIL_DOMAIN: emailDomain }));
+});
+
+// ── Belbaas admin ─────────────────────────────────────────
+// Simple form to send the welcome email to a new Belbaas.
+// Protected by ADMIN_TOKEN env var; keep this URL private.
+app.get('/belbaas-sturen', (req, res) => {
+    const token = req.query.token || '';
+    const adminToken = process.env.ADMIN_TOKEN || '';
+    if (!adminToken || token !== adminToken) {
+        return res.status(403).send('Toegang geweigerd. Voeg ?token=... toe aan de URL.');
+    }
+    res.send(render('belbaas-sturen.html', { APP_NAME, TOKEN: token }));
+});
+
+const uploadBelbaas = multer({ storage: multer.memoryStorage(), limits: { fileSize: 10 * 1024 * 1024 } });
+app.post('/api/send-belbaas', uploadBelbaas.single('flyer'), async (req, res) => {
+    const token = req.body?.token || req.headers['x-admin-token'] || '';
+    const adminToken = process.env.ADMIN_TOKEN || '';
+    if (!adminToken || token !== adminToken) {
+        return res.status(403).json({ error: 'Unauthorized' });
+    }
+    const { naam, email, code, link, datum, tijd } = req.body || {};
+    if (!naam || !email || !code || !link) {
+        return res.status(400).json({ error: 'naam, email, code en link zijn verplicht' });
+    }
+    const bijlage = req.file ? {
+        content: req.file.buffer.toString('base64'),
+        name: req.file.originalname,
+        type: 'application/pdf',
+    } : null;
+    try {
+        await sendBelbaasEmail({ naam, email, code, link, datum, tijd, bijlage });
+        res.json({ ok: true });
+    } catch (err) {
+        console.error('[belbaas-sturen] send failed:', err.message);
+        res.status(500).json({ error: err.message });
+    }
 });
 
 // Manuals for caretakers and organizations, with screenshots from staging's demo data.
