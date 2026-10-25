@@ -1,0 +1,111 @@
+[
+ {
+  "path": "/org",
+  "out": "org-inloggen.png",
+  "width": 1280,
+  "height": 760,
+  "as": null
+ },
+ {
+  "path": "/org",
+  "out": "org-overzicht.png",
+  "width": 1280,
+  "height": 760,
+  "as": "org"
+ },
+ {
+  "path": "/org/bellen",
+  "out": "org-bellen.png",
+  "width": 1280,
+  "height": 760,
+  "as": "org"
+ },
+ {
+  "path": "/org/bel/yz5x5s",
+  "out": "org-bel.png",
+  "width": 1280,
+  "height": 860,
+  "as": "org"
+ },
+ {
+  "path": "/org/bel/yz5x5s",
+  "out": "org-bel-beheerder.png",
+  "width": 1280,
+  "height": 760,
+  "as": "org",
+  "scrollTo": "Naam en locatie"
+ },
+ {
+  "path": "/org/bel/t2gdtb",
+  "out": "org-bel-geen-beheerder.png",
+  "width": 1280,
+  "height": 760,
+  "as": "org",
+  "scrollTo": "Naam en locatie"
+ },
+ {
+  "path": "/org/activiteit",
+  "out": "org-activiteit.png",
+  "width": 1280,
+  "height": 860,
+  "as": "org"
+ },
+ {
+  "path": "/org/huisstijl",
+  "out": "org-huisstijl.png",
+  "width": 1280,
+  "height": 860,
+  "as": "org"
+ },
+ {
+  "path": "/org/collegas",
+  "out": "org-collegas.png",
+  "width": 1280,
+  "height": 700,
+  "as": "org"
+ },
+ {
+  "path": "/beheer",
+  "out": "beheer-inloggen.png",
+  "width": 390,
+  "height": 760,
+  "as": null
+ },
+ {
+  "path": "/app",
+  "out": "app-menu.png",
+  "width": 390,
+  "height": 760,
+  "as": null,
+  "click": "☰"
+ },
+ {
+  "path": "/beheer",
+  "out": "beheer-bellen.png",
+  "width": 390,
+  "height": 760,
+  "as": "caretaker"
+ },
+ {
+  "path": "/beheer/{wilg}",
+  "out": "beheer-bel.png",
+  "width": 390,
+  "height": 760,
+  "as": "caretaker"
+ },
+ {
+  "path": "/beheer/{wilg}",
+  "out": "beheer-bel-onder.png",
+  "width": 390,
+  "height": 760,
+  "as": "caretaker",
+  "scrollTo": "Actieve uren"
+ },
+ {
+  "path": "/beheer/account",
+  "out": "beheer-account.png",
+  "width": 390,
+  "height": 760,
+  "as": "caretaker"
+ }
+]

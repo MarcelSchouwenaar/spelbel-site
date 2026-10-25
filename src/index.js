@@ -89,6 +89,14 @@ app.get('/privacy', (req, res) => {
     res.send(render('privacy.html', { APP_NAME, CONTACT_EMAIL_USER: emailUser, CONTACT_EMAIL_DOMAIN: emailDomain }));
 });
 
+// Manuals for caretakers and organizations, with screenshots from staging's demo data.
+for (const [slug, file] of [['belbazen', 'handleiding-belbazen.html'], ['organisaties', 'handleiding-organisaties.html']]) {
+    app.get(`/handleiding/${slug}`, (req, res) => {
+        const [emailUser, emailDomain] = (process.env.CONTACT_EMAIL || '@').split('@');
+        res.send(render(file, { APP_NAME, CONTACT_EMAIL_USER: emailUser, CONTACT_EMAIL_DOMAIN: emailDomain }));
+    });
+}
+
 // Wij willen een SpelBel — list locations with verified signups
 app.get('/api/locations', async (req, res) => {
     try {
