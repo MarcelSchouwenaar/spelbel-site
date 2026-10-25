@@ -102,6 +102,14 @@
   "scrollTo": "Actieve uren"
  },
  {
+  "path": "/beheer/{wilg}",
+  "out": "beheer-beheerders-code.png",
+  "width": 390,
+  "height": 760,
+  "as": "caretaker",
+  "click": "Medebeheerder toevoegen"
+ },
+ {
   "path": "/beheer/account",
   "out": "beheer-account.png",
   "width": 390,

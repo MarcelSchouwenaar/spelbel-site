@@ -46,7 +46,13 @@ for (const s of shots) {
     path = path.replace('{wilg}', bellId);
   }
   await go(`${base}${path}`);
-  if (s.click) { await evaluate(`[...document.querySelectorAll('div,a,button,span')].reverse().find((e) => e.textContent.trim() === ${JSON.stringify(s.click)})?.click()`); await sleep(1500); }
+  if (s.click) {
+    // A real mouse press and release: React Native Web's Pressable listens for those, not for click().
+    const box = await evaluate(`(() => { const e = [...document.querySelectorAll('div,a,button,span')].reverse().find((x) => x.textContent.trim().endsWith(${JSON.stringify(s.click)}));
+      if (!e) return null; e.scrollIntoView({ block: 'center' }); const r = e.getBoundingClientRect(); return { x: r.x + r.width / 2, y: r.y + r.height / 2 }; })()`);
+    if (box) for (const type of ['mousePressed', 'mouseReleased']) await send('Input.dispatchMouseEvent', { type, x: box.x, y: box.y, button: 'left', clickCount: 1 });
+    await sleep(2000);
+  }
   if (s.scrollTo) { await evaluate(`[...document.querySelectorAll('div,span,h1,h2,p')].reverse().find((e) => e.textContent.includes(${JSON.stringify(s.scrollTo)}))?.scrollIntoView({ block: 'start' })`); await sleep(600); }
   await evaluate(`(() => { const w = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT); let n; while ((n = w.nextNode())) n.nodeValue = n.nodeValue.replace(' · testomgeving', ''); })()`);
   writeFileSync(`${outDir}/${s.out}`, Buffer.from((await send('Page.captureScreenshot', { format: 'png' })).data, 'base64'));
