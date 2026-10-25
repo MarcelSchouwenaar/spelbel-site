@@ -15,11 +15,7 @@
 </head>
 <body class="privacy-page">
 
-  <header>
-    <a href="/">← Home</a>
-    <div class="logo"><img src="/images/logo.svg" alt="{{APP_NAME}} Logo"></div>
-    <span>&nbsp;</span>
-  </header>
+{{SITE_HEADER}}
 
   <div class="content">
     <h2>Privacybeleid</h2>
@@ -142,8 +138,6 @@
     <p>Voor vragen over dit beleid of je gegevens: <a href="#" data-u="{{CONTACT_EMAIL_USER}}" data-d="{{CONTACT_EMAIL_DOMAIN}}" onclick="this.href='mailto:'+this.dataset.u+'@'+this.dataset.d">{{CONTACT_EMAIL_USER}}&#64;{{CONTACT_EMAIL_DOMAIN}}</a>. Marcel Schouwenaar Design, KvK 95340742.</p>
   </div>
 
-  <footer>
-    <p><a href="/">← Terug naar {{APP_NAME}}</a> &nbsp;·&nbsp; ScrollScrollScroll &nbsp;·&nbsp; <a href="{{APP_URL}}/auth/login">Inloggen beheerders</a></p>
-  </footer>
+{{SITE_FOOTER}}
 </body>
 </html>

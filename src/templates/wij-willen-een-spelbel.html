@@ -139,10 +139,6 @@
     text-decoration: none; box-shadow: 6px 6px 0 #000; transition: transform 0.15s;
   }
   .gemeente-btn:hover { transform: translateY(-2px); }
-
-  footer { background: var(--blauw); padding: 36px 24px; text-align: center; color: var(--zwart); font-weight: 600; font-size: 14px; }
-  footer a { color: var(--magenta-donker); font-weight: 700; }
-  .footer-logo { font-family: 'Tomarik', 'Trebuchet MS', 'Lucida Sans Unicode', Arial, sans-serif; font-size: 22px; font-weight: 700; margin-bottom: 10px; }
   .leaflet-popup-content-wrapper { border-radius: 16px; }
   .leaflet-popup-content { font-family: 'Nunito', sans-serif; font-weight: 600; }
   @media (max-width: 600px) {
@@ -163,16 +159,7 @@
   <meta name="theme-color" content="#EE7533">
 </head>
 <body>
-  <header>
-    <div class="logo"><a href="/"><img src="/images/logo.svg" alt="{{APP_NAME}} Logo"></a></div>
-    <div class="header-right">
-      <nav class="main-nav">
-        <a href="#how">Hoe werkt het?</a>
-        <a href="#nieuws">In het nieuws</a>
-      </nav>
-      <a class="btn btn-header" href="/wij-willen-een-spelbel">Wij willen een SpelBel!</a>
-    </div>
-  </header>
+{{SITE_HEADER}}
 
 <section class="hero">
   <div class="hero-inner">
@@ -233,11 +220,7 @@
   </div>
 </section>
 
-<footer>
-  <div class="footer-logo">🔔 Spel Bel</div>
-  <p>Spel Bel is een initiatief van <a href="https://www.scrollscrollscroll.nl" target="_blank">ScrollScrollScroll</a>, ontwerpstudio uit Rotterdam.<br>
-  <a href="mailto:info@scrollscrollscroll.nl">info@scrollscrollscroll.nl</a> &middot; <a href="/">www.spelbel.nl</a><br><a href="{{APP_URL}}/auth/login">Inloggen beheerders</a></p>
-</footer>
+{{SITE_FOOTER}}
 
 <div class="paneel-overlay" id="paneel-overlay" onclick="if(event.target===this)sluitPaneel()">
   <div class="paneel" id="paneel">
