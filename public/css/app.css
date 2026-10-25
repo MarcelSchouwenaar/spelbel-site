@@ -80,33 +80,72 @@ a:hover {
 .btn:active { opacity: .85; transform: scale(.98); }
 
 /* ── Landing page ──────────────────────────────────────── */
-header {
+/* ── Site header: the same on every page (partials/header.html) ── */
+.site-header {
+  position: relative;
   padding: 20px 32px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-}
-header .logo { flex-shrink: 0; }
-header .logo img { width: 200px; height: auto; }
-
-.header-right {
-  display: flex;
-  align-items: center;
   gap: 32px;
 }
+.site-header .logo { flex-shrink: 0; margin-right: auto; }
+.site-header .logo img { width: 200px; height: auto; display: block; }
 
-.main-nav {
-  display: flex;
-  gap: 32px;
-}
-.main-nav a {
+.site-nav { display: flex; align-items: center; gap: 28px; }
+.site-nav > a, .nav-drop > summary {
   color: #111;
   text-decoration: none;
   font-weight: 700;
   font-size: 1rem;
+  cursor: pointer;
 }
-.main-nav a:hover { color: #DD4A93; }
+.site-nav > a:hover, .nav-drop > summary:hover { color: #DD4A93; }
+.nav-drop { position: relative; }
+.nav-drop > summary { list-style: none; }
+.nav-drop > summary::-webkit-details-marker { display: none; }
+.nav-drop > summary::after { content: ' ▾'; font-size: .8em; }
+.nav-drop[open] > summary::after { content: ' ▴'; }
+.nav-menu {
+  position: absolute;
+  top: calc(100% + 12px);
+  left: -16px;
+  z-index: 20;
+  min-width: 220px;
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border: 3px solid #000;
+  border-radius: 16px;
+  box-shadow: 6px 6px 0 #000;
+  padding: 8px;
+}
+.nav-menu a { padding: 10px 12px; border-radius: 10px; color: #111; text-decoration: none; font-weight: 600; }
+.nav-menu a:hover, .nav-menu a:focus-visible { background: #ABE4FF; }
+.site-nav .nav-cta { display: none; }
+.nav-toggle { display: none; background: none; border: 0; font-size: 1.8rem; line-height: 1; cursor: pointer; color: #111; padding: 4px 8px; }
+
+@media screen and (max-width: 900px) {
+  .site-header { padding: 16px 20px; gap: 12px; flex-wrap: wrap; }
+  .site-header .logo img { width: 140px; }
+  .site-header .header-cta { display: none; }
+  .site-nav .nav-cta { display: block; margin: 8px 4px 4px; text-align: center; }
+  .nav-toggle { display: block; }
+  .site-nav {
+    display: none;
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    background: #fff;
+    border: 3px solid #000;
+    border-radius: 16px;
+    box-shadow: 6px 6px 0 #000;
+    padding: 8px;
+  }
+  .nav-open .site-nav { display: flex; }
+  .site-nav > a, .nav-drop > summary { display: block; padding: 12px; font-size: 1.05rem; }
+  .nav-menu { position: static; border: 0; box-shadow: none; padding: 0 0 4px 16px; min-width: 0; }
+}
 
 .btn-header {
   display: inline-block;
@@ -307,14 +346,14 @@ header .logo img { width: 200px; height: auto; }
 .nieuwsbrief-form .btn-nw { background: #d4f04c; color: #000; border: none; cursor: pointer; font-size: 18px; padding: 14px 28px; }
 .nieuwsbrief-melding { margin-top: 16px; color: #fff; font-weight: 600; min-height: 24px; }
 
-footer {
-  padding: 40px 24px;
-  text-align: center;
-  color: #000;
-  font-size: .8rem;
-}
-footer a { color: #000; text-decoration: underline; }
-footer a:hover { color: #111; }
+/* ── Site footer: the same on every page (partials/footer.html) ── */
+.site-footer { padding: 48px 24px 32px; color: #000; font-size: .9rem; border-top: 3px solid #000; background: #fff; }
+.footer-cols { max-width: 1000px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 28px; }
+.footer-cols h4 { font-family: 'Tomarik', 'Trebuchet MS', Arial, sans-serif; font-size: 1.1rem; margin-bottom: 10px; }
+.footer-cols a { display: block; color: #000; text-decoration: none; margin-bottom: 6px; }
+.footer-cols a:hover { color: #DD4A93; text-decoration: underline; }
+.footer-credit { max-width: 1000px; margin: 32px auto 0; text-align: center; font-size: .8rem; }
+.footer-credit a { color: #000; }
 
 
 /* ── Thank you page ─────────────────────────────────────── */
@@ -411,8 +450,6 @@ body.privacy-page { line-height: 1.7; }
 
 @media screen and (max-width: 768px) {
   body { font-size: 16px; }
-  header { padding: 16px 20px; flex-wrap: wrap; justify-content: center; gap: 12px; }
-  .main-nav { display: none; }
   .hero { flex-direction: column; padding: 48px 24px 80px; gap: 0px; margin: -40px 0 0; background-size: auto 100%; background-position: center center; }
   .hero-text { max-width: 100%; text-align: center; display: flex; flex-direction: column; align-items: center; }
   .hero h2 { font-size: 2.4rem; }

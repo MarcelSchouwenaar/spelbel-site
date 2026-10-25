@@ -16,16 +16,7 @@
   <meta name="theme-color" content="#EE7533">
 </head>
 <body>
-  <header>
-    <div class="logo"><img src="/images/logo.svg" alt="{{APP_NAME}} Logo"></div>
-    <div class="header-right">
-      <nav class="main-nav">
-        <a href="#how">Hoe werkt het?</a>
-        <a href="#nieuws">In het nieuws</a>
-      </nav>
-      <a class="btn btn-header" href="/wij-willen-een-spelbel">Wij willen een SpelBel!</a>
-    </div>
-  </header>
+{{SITE_HEADER}}
 
   <section class="hero">
     <div class="hero-text">
@@ -105,7 +96,7 @@
     </div>
   </section>
 
-  <section class="faq">
+  <section class="faq" id="faq">
     <div class="faq-inner">
       <h2>Best veelgestelde vragen</h2>
       <div class="accordion">
@@ -207,7 +198,7 @@
     </div>
   </section>
 
-  <section class="nieuwsbrief">
+  <section class="nieuwsbrief" id="nieuwsbrief">
     <div class="nieuwsbrief-inner">
       <h3>Blijf op de hoogte</h3>
       <p>Schrijf je in voor de SpelBel nieuwsbrief en mis niets.</p>
@@ -219,10 +210,7 @@
     </div>
   </section>
 
-  <footer>
-    <p>{{APP_NAME}} is een project van <a href="https://www.scrollscrollscroll.nl" target="_blank" rel="noopener">ScrollScrollScroll</a> </p>
-    <p style="margin-top:8px"><a href="/privacy">Privacy Policy</a> &nbsp;·&nbsp; <a href="{{APP_URL}}/auth/login">Inloggen beheerders</a></p>
-  </footer>
+{{SITE_FOOTER}}
 <script>
 async function nieuwsbriefAanmelden() {
   const email = document.getElementById('nw-email').value.trim();

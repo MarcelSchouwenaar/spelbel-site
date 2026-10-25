@@ -1,0 +1,42 @@
+  <header class="site-header">
+    <a class="logo" href="/"><img src="/images/logo.svg" alt="{{APP_NAME}}"></a>
+    <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav" aria-label="Menu">☰</button>
+    <nav class="site-nav" id="site-nav" aria-label="Hoofdmenu">
+      <a href="/#how">Hoe werkt het</a>
+      <a href="/app">Mijn bellen</a>
+      <details class="nav-drop">
+        <summary>Handleiding</summary>
+        <div class="nav-menu">
+          <a href="/handleiding/belbazen">Voor Bel Bazen</a>
+          <a href="/handleiding/organisaties">Voor organisaties</a>
+        </div>
+      </details>
+      <details class="nav-drop">
+        <summary>Inloggen</summary>
+        <div class="nav-menu">
+          <a href="{{APP_URL}}/beheer">Als Bel Baas</a>
+          <a href="{{APP_URL}}/org">Als organisatie</a>
+        </div>
+      </details>
+      <a class="btn btn-header nav-cta" href="/wij-willen-een-spelbel">Wij willen een SpelBel!</a>
+    </nav>
+    <a class="btn btn-header header-cta" href="/wij-willen-een-spelbel">Wij willen een SpelBel!</a>
+  </header>
+  <script>
+  (function () {
+    var header = document.currentScript.previousElementSibling;
+    var toggle = header.querySelector('.nav-toggle');
+    var drops = header.querySelectorAll('.nav-drop');
+    toggle.addEventListener('click', function () {
+      var open = header.classList.toggle('nav-open');
+      toggle.setAttribute('aria-expanded', String(open));
+      toggle.textContent = open ? '✕' : '☰';
+    });
+    // One dropdown at a time; outside a click or on Escape, none.
+    drops.forEach(function (d) {
+      d.addEventListener('toggle', function () { if (d.open) drops.forEach(function (o) { if (o !== d) o.open = false; }); });
+    });
+    document.addEventListener('click', function (e) { drops.forEach(function (d) { if (!d.contains(e.target)) d.open = false; }); });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') drops.forEach(function (d) { d.open = false; }); });
+  })();
+  </script>
