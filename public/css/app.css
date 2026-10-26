@@ -869,12 +869,12 @@ body.auth-page {
 .vg-foto img { display: block; width: 100%; aspect-ratio: 3 / 1; object-fit: cover; }
 
 .vg-stappen { padding: 80px 24px; color: #003D86; }
-.vg-stappen h2 { font-size: clamp(1.8rem, 3.5vw, 2.5rem); text-transform: uppercase; margin-bottom: 40px; }
-.vg-stappen-lijst { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
-.vg-stappen-lijst li { background: #FDF3EA; border-radius: 16px; padding: 24px 20px; }
-.vg-stap-num { display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 50%; background: #003D86; color: #fff; font-family: 'Tomarik', 'Trebuchet MS', Arial, sans-serif; font-size: .95rem; margin-bottom: 16px; }
-.vg-stappen-lijst h3 { font-family: 'Hanken Grotesk', sans-serif; font-size: 1.15rem; font-weight: 800; line-height: 1.3; margin-bottom: 10px; }
-.vg-stappen-lijst p { font-size: .9rem; line-height: 1.5; }
+.vg-stappen h2 { font-size: clamp(1.8rem, 3.5vw, 2.5rem); line-height: 1.15; text-transform: uppercase; margin-bottom: 40px; }
+.vg-stappen-lijst { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+.vg-stappen-lijst li { background: #FDF3EA; border-radius: 24px; padding: 28px; }
+.vg-stap-num { display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; background: #003D86; color: #fff; font-family: 'Tomarik', 'Trebuchet MS', Arial, sans-serif; font-size: 1.1rem; margin-bottom: 16px; }
+.vg-stappen-lijst h3 { font-family: 'Hanken Grotesk', sans-serif; font-size: 1.3rem; font-weight: 800; line-height: 1.3; margin-bottom: 10px; }
+.vg-stappen-lijst p { font-size: 1rem; line-height: 1.5; }
 
 .vg-sectie { padding: 80px 24px; color: #003D86; }
 .vg-sectie h2 { font-size: clamp(1.8rem, 3.5vw, 2.5rem); line-height: 1.15; text-transform: uppercase; margin-bottom: 16px; }
@@ -887,6 +887,8 @@ body.auth-page {
 .vg-prijzen { background: #E0DCFF; }
 .vg-perzik { background: #FDF3EA; }
 .vg-lichtblauw { background: #ABE4FF; }
+.vg-jb { display: inline-flex; align-items: center; gap: 14px; background: #3A8CEE; color: #fff; font-weight: 800; border-radius: 16px; padding: 12px 20px; margin: -12px 0 32px !important; }
+.vg-jb img { height: 32px; width: auto; }
 .vg-kaarten { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
 .vg-prijs, .vg-partner, .vg-plek, .vg-voorbeeld { background: #fff; border-radius: 24px; padding: 28px; }
 .vg-bedrag { font-family: 'Tomarik', 'Trebuchet MS', Arial, sans-serif; font-size: 3.25rem; line-height: 1; margin-bottom: 8px !important; }
@@ -902,10 +904,18 @@ body.auth-page {
 .vg-lijst li { position: relative; padding-left: 24px; }
 .vg-lijst li::before { content: ''; position: absolute; left: 0; top: .5em; width: 10px; height: 10px; border-radius: 50%; background: #3A8CEE; }
 .vg-plaatshouder { min-height: 340px; border: 3px dashed #3A8CEE; border-radius: 24px; background: #EEF5FF; display: flex; align-items: center; justify-content: center; text-align: center; padding: 32px; font-weight: 700; }
+.vg-screenshot { display: block; width: 100%; aspect-ratio: 16 / 6; object-fit: cover; object-position: top left; border-radius: 24px; box-shadow: 0 12px 32px rgba(0, 61, 134, .18); background: #F1F2F4; }
+.vg-logos { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+.vg-logos li { background: #fff; border-radius: 24px; height: 140px; display: flex; align-items: center; justify-content: center; padding: 24px; }
+.vg-logos img { max-width: 100%; max-height: 80px; object-fit: contain; }
+.vg-logos span { font-family: 'Tomarik', 'Trebuchet MS', Arial, sans-serif; font-size: 1.4rem; text-transform: uppercase; }
+.vg-foto-staand { display: block; width: 100%; max-height: 560px; aspect-ratio: 4 / 5; object-fit: cover; object-position: center 60%; border-radius: 24px; }
 .vg-plekken { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
 .vg-plek p { margin: 0; }
 .vg-opening { font-weight: 800; font-size: .9rem; color: #3A8CEE; margin-top: 6px !important; }
 .vg-logo { min-height: 96px; padding: 16px; margin-bottom: 16px; font-size: .9rem; }
+.vg-logo-vak { height: 96px; margin-bottom: 16px; display: flex; align-items: center; }
+.vg-logo-vak img { max-height: 80px; max-width: 100%; }
 .vg-logo-img { display: block; height: 96px; width: auto; max-width: 100%; object-fit: contain; margin-bottom: 16px; background: #3A8CEE; border-radius: 16px; padding: 20px; box-sizing: border-box; }
 .vg-bestel { background: #186ED5; color: #fff; }
 .vg-bestel h2, .vg-bestel a { color: #fff; }
@@ -918,8 +928,8 @@ body.auth-page {
 .vg-form .vg-klein { margin: 0; color: #5A6360; }
 
 @media screen and (max-width: 900px) {
-  .vg-stappen-lijst { grid-template-columns: 1fr 1fr; }
-  .vg-kaarten, .vg-plekken { grid-template-columns: 1fr 1fr; }
+  .vg-stappen-lijst { grid-template-columns: 1fr; }
+  .vg-kaarten, .vg-plekken, .vg-logos { grid-template-columns: 1fr 1fr; }
   .vg-split, .vg-voorbeeld { grid-template-columns: 1fr; gap: 32px; }
   .vg-stats-inner { grid-template-columns: 1fr; gap: 20px; }
 }
