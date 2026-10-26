@@ -39,7 +39,7 @@
   .aanmeld-stat .stat-getal { font-family: 'Tomarik', 'Trebuchet MS', 'Lucida Sans Unicode', Arial, sans-serif; font-size: 4.5rem; font-weight: 700; line-height: 1; flex-shrink: 0; }
   .aanmeld-stat.donker .stat-getal { color: #C9B8FF; }
   .aanmeld-stat.licht .stat-getal { color: #fff; }
-  .aanmeld-stat .stat-label { font-family: 'Hanken Grotesk', sans-serif; font-size: 1.3rem; line-height: 1.35; font-weight: 500; color: #fff; }
+  .aanmeld-stat .stat-label { font-family: 'Hanken Grotesk', sans-serif; font-size: 18px; line-height: 1.35; font-weight: 500; color: #fff; }
   @media (max-width: 900px) {
     .aanmeld-hero { padding: 130px 24px 64px; }
     .aanmeld-hero-inner { grid-template-columns: 1fr; gap: 40px; }
@@ -133,18 +133,19 @@
   .succes-blok h4 { font-family: 'Tomarik', 'Trebuchet MS', 'Lucida Sans Unicode', Arial, sans-serif; font-size: 24px; margin-bottom: 8px; }
   .succes-blok p { font-size: 14px; font-weight: 600; color: #333; }
 
-  .gemeente-strip { background: var(--zwart); color: var(--wit); padding: 48px 24px; text-align: center; }
+  .gemeente-strip { background: #003D86; color: var(--wit); padding: 48px 24px; text-align: center; }
   .gemeente-strip-inner { max-width: 640px; margin: 0 auto; }
   .gemeente-strip h2 { font-size: clamp(26px, 4vw, 36px); margin-bottom: 14px; color: var(--wit); }
-  .gemeente-strip p { font-size: 17px; color: #C8C8C8; font-weight: 600; margin-bottom: 26px; }
+  .gemeente-strip p { font-size: 17px; color: #fff; font-weight: 600; margin-bottom: 26px; }
   .gemeente-btn {
     display: inline-flex; align-items: center; gap: 10px;
-    background: #d4f04c; color: #000;
+    background: #FFF77A; color: #003D86;
     font-family: 'Tomarik', 'Trebuchet MS', 'Lucida Sans Unicode', Arial, sans-serif;
-    font-size: 24px; font-weight: 800; padding: 14px 32px; border-radius: 16px;
-    text-decoration: none; box-shadow: 6px 6px 0 #000; transition: transform 0.15s;
+    font-size: 24px; font-weight: 800; padding: 10px 32px; border-radius: 99px;
+    text-transform: uppercase; letter-spacing: 0.04em;
+    text-decoration: none; transition: transform 0.15s;
   }
-  .gemeente-btn:hover { transform: translateY(-2px); }
+  .gemeente-btn:hover { color: #1652D4; transform: translateY(-2px); }
   .leaflet-popup-content-wrapper { border-radius: 16px; }
   .leaflet-popup-content { font-family: 'Nunito', sans-serif; font-weight: 600; }
   @media (max-width: 600px) {
@@ -222,7 +223,7 @@
   <div class="gemeente-strip-inner">
     <h2>Werk je bij een gemeente?</h2>
     <p>Zie precies waar in jouw gemeente vraag is naar een Spel Bel. We gaan graag met je in gesprek over een pilot.</p>
-    <a href="mailto:info@spelbel.nl" class="gemeente-btn">✉️ Neem contact op</a>
+    <a href="/voor-gemeenten" class="gemeente-btn">Voor gemeenten</a>
   </div>
 </section>
 
