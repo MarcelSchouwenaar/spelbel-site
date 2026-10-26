@@ -80,9 +80,8 @@ app.get('/wij-willen-een-spelbel', (req, res) => {
     res.send(render('wij-willen-een-spelbel.html', { APP_NAME, APP_URL }));
 });
 
-// Voor gemeenten is nog niet af: alleen lokaal bereikbaar, niet op Railway (en niet in het menu)
-app.get('/voor-gemeenten', (req, res, next) => {
-    if (process.env.RAILWAY_ENVIRONMENT_NAME || process.env.RAILWAY_ENVIRONMENT) return next();
+// Voor gemeenten is nog een testpagina: bereikbaar via de link, maar niet in het menu (en noindex)
+app.get('/voor-gemeenten', (req, res) => {
     const [vgEmailUser, vgEmailDomain] = (process.env.CONTACT_EMAIL || '@').split('@');
     res.send(render('voor-gemeenten.html', { APP_NAME, APP_URL, CONTACT_EMAIL_USER: vgEmailUser, CONTACT_EMAIL_DOMAIN: vgEmailDomain }));
 });
