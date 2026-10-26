@@ -147,11 +147,11 @@ a:hover {
   padding: 16px 0;
 }
 .nav-menu a {
-  padding: 12px 32px;
+  padding: 10px 24px;
   color: #1652D4;
   text-decoration: none;
   font-family: 'Tomarik', 'Trebuchet MS', 'Lucida Sans Unicode', Arial, sans-serif;
-  font-size: 1.25rem;
+  font-size: 1rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -164,7 +164,7 @@ a:hover {
 .nav-more > .nav-menu { left: auto; right: -16px; }
 .nav-more-group { display: flex; flex-direction: column; }
 .nav-more-group + .nav-more-group { border-top: 1px solid #E3ECF8; margin-top: 8px; padding-top: 8px; }
-.nav-more-label { padding: 12px 32px 0; font-size: .8rem; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; color: #666; }
+.nav-more-label { padding: 12px 24px 0; font-size: .8rem; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; color: #666; }
 
 .nav-menu a.nav-more-cta { background: #FFF77A; color: #003D86; font-weight: 800; text-transform: uppercase; letter-spacing: .04em; text-align: center; border-radius: 99px; margin: 4px 20px 8px; padding: 10px 20px; }
 .nav-menu a.nav-more-cta:hover, .nav-menu a.nav-more-cta:focus-visible { background: #FFF77A; color: #1652D4; }
@@ -454,29 +454,31 @@ a:hover {
 .pill-sig { background: #020f89; }
 .pill .tag { font-size: .7rem; font-weight: 400; opacity: .85; }
 
-.about { padding: 56px 24px; background: #d4f04c; }
+.about { padding: 56px 24px; background: #FFF77A; color: #003D86; }
 .about-inner { max-width: 600px; margin: 0 auto; }
 .about h3 { font-size: 2rem; font-weight: 700; margin-bottom: 16px; text-align: center; }
 .about p { text-align: center; }
 .about a { color: inherit; text-decoration: underline; }
 
-.nieuwsbrief { padding: 56px 24px; background: #DD4A93; }
+.nieuwsbrief { padding: 56px 24px; background: #E0DCFF; color: #003D86; }
 .nieuwsbrief-inner { max-width: 560px; margin: 0 auto; text-align: center; }
-.nieuwsbrief h3 { font-family: 'Tomarik', sans-serif; font-size: 2rem; color: #fff; margin-bottom: 12px; }
-.nieuwsbrief p { color: #fff; margin-bottom: 28px; font-size: 1rem; }
+.nieuwsbrief h3 { font-family: 'Tomarik', sans-serif; font-size: 2rem; color: #003D86; margin-bottom: 12px; }
+.nieuwsbrief p { color: #003D86; margin-bottom: 28px; font-size: 1rem; }
 .nieuwsbrief-form { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
 .nieuwsbrief-form input[type="email"] { flex: 1; min-width: 220px; padding: 14px 20px; border: none; border-radius: 16px; font-family: 'Hanken Grotesk', sans-serif; font-size: 1rem; outline: none; }
-.nieuwsbrief-form .btn-nw { background: #d4f04c; color: #000; border: none; cursor: pointer; font-size: 18px; padding: 14px 28px; }
-.nieuwsbrief-melding { margin-top: 16px; color: #fff; font-weight: 600; min-height: 24px; }
+.nieuwsbrief-form .btn-nw { background: #FFF77A; color: #003D86; border: none; border-radius: 99px; cursor: pointer; font-size: 18px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em; padding: 14px 28px; transition: transform .15s; }
+.nieuwsbrief-form .btn-nw:hover { color: #1652D4; transform: translateY(-2px); }
+.nieuwsbrief-melding { margin-top: 16px; color: #003D86; font-weight: 600; min-height: 24px; }
 
 /* ── Site footer: the same on every page (partials/footer.html) ── */
-.site-footer { padding: 48px 24px 32px; color: #000; font-size: .9rem; border-top: 3px solid #000; background: #fff; }
+.site-footer { padding: 48px 24px 32px; color: #fff; font-size: .9rem; background: #186ED5; }
 .footer-cols { max-width: 1000px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 28px; }
 .footer-cols h4 { font-family: 'Tomarik', 'Trebuchet MS', Arial, sans-serif; font-size: 1.1rem; margin-bottom: 10px; }
-.footer-cols a { display: block; color: #000; text-decoration: none; margin-bottom: 6px; }
-.footer-cols a:hover { color: #DD4A93; text-decoration: underline; }
+.footer-cols a { display: block; color: #fff; text-decoration: none; margin-bottom: 6px; }
+.footer-cols a:hover { color: #FFF77A; text-decoration: underline; }
 .footer-credit { max-width: 1000px; margin: 32px auto 0; text-align: center; font-size: .8rem; }
-.footer-credit a { color: #000; }
+.footer-credit a { color: #fff; }
+.footer-credit a:hover { color: #FFF77A; }
 
 
 /* ── Thank you page ─────────────────────────────────────── */
