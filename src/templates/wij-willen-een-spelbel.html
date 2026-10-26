@@ -18,27 +18,44 @@
     --tekst: #1A1A1A; --tekst-licht: #5A6360;
   }
   html { scroll-behavior: smooth; }
-  body { font-family: 'Nunito', sans-serif; background: var(--blauw); color: var(--tekst); line-height: 1.6; overflow-x: hidden; }
+  body { font-family: 'Nunito', sans-serif; background: var(--wit); color: var(--tekst); line-height: 1.6; overflow-x: hidden; }
   h1, h2, h3 { font-family: 'Tomarik', 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif; font-weight: 400; }
 
-  header { background: #fff; }
+  /* Header in het geel van het aanmeldblok */
+  .aanmeld-page .site-header { background: #FFF77A; }
+  .aanmeld-page .site-nav > .btn-header { background: #003D86; color: #fff; }
+  .aanmeld-page .site-nav > .btn-header:hover { color: #FFF77A; }
 
-  .hero { background: var(--blauw); padding: 44px 24px 36px; margin: 0; text-align: center; position: relative; overflow: hidden; min-height: 24vh; }
-  .hero::before, .hero::after { content: '🔔'; position: absolute; font-size: 110px; opacity: 0.08; pointer-events: none; }
-  .hero::before { top: 10px; left: -20px; transform: rotate(-20deg); }
-  .hero::after { bottom: -20px; right: -10px; transform: rotate(15deg); }
-  .hero-inner { max-width: 720px; margin: 0 auto; position: relative; z-index: 2; }
-  .hero-badge { display: inline-flex; align-items: center; gap: 8px; background: var(--wit); color: var(--magenta); font-weight: 800; font-size: 13px; letter-spacing: 0.5px; text-transform: uppercase; padding: 8px 18px; border-radius: 24px; margin-bottom: 20px; box-shadow: 0 4px 14px rgba(0,0,0,0.08); }
-  .hero-badge .puls { width: 8px; height: 8px; border-radius: 50%; background: var(--magenta); animation: puls 1.5s infinite; }
-  @keyframes puls { 0%{box-shadow:0 0 0 0 rgba(236,14,115,0.5);} 70%{box-shadow:0 0 0 8px rgba(236,14,115,0);} 100%{box-shadow:0 0 0 0 rgba(236,14,115,0);} }
-  .hero h1 { font-size: clamp(34px, 6vw, 56px); line-height: 1.05; color: var(--zwart); margin-bottom: 14px; font-weight: 700; }
-  .hero h1 .magenta { color: var(--magenta); }
-  .hero p { font-size: 18px; color: var(--zwart); max-width: 560px; margin: 0 auto; font-weight: 600; }
+  .aanmeld-hero { background: #FFF77A; padding: 180px 32px 110px; }
+  .aanmeld-hero-inner { max-width: 1240px; margin: 0 auto; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 72px; align-items: center; }
+  .aanmeld-hero h1 { font-size: clamp(2.25rem, 5vw, 4.5rem); line-height: 1.1; text-transform: uppercase; color: #003D86; font-weight: 700; margin-bottom: 24px; }
+  .aanmeld-hero p { font-family: 'Hanken Grotesk', sans-serif; font-size: clamp(1.1rem, 1.6vw, 1.4rem); line-height: 1.5; font-weight: 500; color: #003D86; max-width: 680px; }
+  .aanmeld-stats { display: flex; flex-direction: column; align-items: flex-start; gap: 24px; }
+  .aanmeld-stat { display: flex; align-items: center; gap: 28px; padding: 28px 28px; border-radius: 24px; width: 420px; max-width: 100%; }
+  .aanmeld-stat { gap: 20px; }
+  .aanmeld-stat .stat-icoon { width: 56px; height: 56px; border-radius: 50%; background: #fff; display: flex; align-items: center; justify-content: center; font-size: 28px; flex-shrink: 0; }
+  .aanmeld-stat.donker { background: #003D86; }
+  .aanmeld-stat.licht { background: #3A8CEE; }
+  .aanmeld-stat .stat-getal { font-family: 'Tomarik', 'Trebuchet MS', 'Lucida Sans Unicode', Arial, sans-serif; font-size: 4.5rem; font-weight: 700; line-height: 1; flex-shrink: 0; }
+  .aanmeld-stat.donker .stat-getal { color: #C9B8FF; }
+  .aanmeld-stat.licht .stat-getal { color: #fff; }
+  .aanmeld-stat .stat-label { font-family: 'Hanken Grotesk', sans-serif; font-size: 1.3rem; line-height: 1.35; font-weight: 500; color: #fff; }
+  @media (max-width: 900px) {
+    .aanmeld-hero { padding: 130px 24px 64px; }
+    .aanmeld-hero-inner { grid-template-columns: 1fr; gap: 40px; }
+    .aanmeld-stat { width: 100%; max-width: 420px; }
+  }
+  @media (max-width: 520px) {
+    .aanmeld-stat { padding: 20px 24px; gap: 14px; }
+    .aanmeld-stat .stat-icoon { width: 44px; height: 44px; font-size: 22px; }
+    .aanmeld-stat .stat-getal { font-size: 3.5rem; }
+    .aanmeld-stat .stat-label { font-size: 1.1rem; }
+  }
 
-  .kaart-sectie { max-width: 1240px; margin: 0 auto; padding: 28px 24px 60px; }
+  .kaart-sectie { max-width: 1240px; margin: 0 auto; padding: 16px 24px 80px; }
   .kaart-card { background: var(--wit); border-radius: 28px; overflow: hidden; box-shadow: 0 16px 50px rgba(0,0,0,0.12); position: relative; }
-  .kaart-header { padding: 18px 24px; border-bottom: 2px solid var(--grijs); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
-  .kaart-header h3 { font-size: 21px; color: var(--zwart); display: flex; align-items: center; gap: 8px; }
+  .kaart-header { padding: 18px 24px; background: #fff; border-bottom: 2px solid var(--grijs); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+  .kaart-header h3 { font-size: 21px; color: #003D86; display: flex; align-items: center; gap: 8px; }
   .kaart-header-rechts { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
   .kaart-zoek { display: flex; align-items: center; gap: 8px; background: var(--grijs); border-radius: 22px; padding: 8px 16px; min-width: 200px; }
   .kaart-zoek input { border: none; background: none; outline: none; font-family: 'Nunito', sans-serif; font-size: 14px; font-weight: 600; width: 100%; color: var(--zwart); }
@@ -52,45 +69,50 @@
   .zoek-leeg { padding: 12px 16px; font-size: 13px; color: var(--tekst-licht); font-weight: 600; }
   .kaart-wrap { position: relative; }
   #kaart { height: 540px; width: 100%; background: var(--blauw-licht); cursor: grab; }
-  #kaart.plaatsmodus, #kaart.plaatsmodus .leaflet-grab, #kaart.plaatsmodus .leaflet-interactive, #kaart.plaatsmodus .leaflet-container { cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 48 48'%3E%3Ccircle cx='24' cy='24' r='21' fill='%23DD4A93' stroke='%231A1A1A' stroke-width='3'/%3E%3Cpath d='M24 13 L24 35 M13 24 L35 24' stroke='white' stroke-width='5' stroke-linecap='round'/%3E%3C/svg%3E") 24 24, crosshair !important; }
-  .kaart-wrap.plaatsmodus-actief { box-shadow: inset 0 0 0 4px var(--magenta); border-radius: 0 0 28px 28px; }
-  .kaart-wrap.plaatsmodus-actief::after { content: ''; position: absolute; inset: 0; background: rgba(236,14,115,0.04); pointer-events: none; z-index: 500; }
-  .kaart-hint { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 600; background: var(--zwart); color: var(--wit); font-weight: 700; font-size: 14px; padding: 10px 20px; border-radius: 24px; box-shadow: 0 6px 20px rgba(0,0,0,0.25); display: flex; align-items: center; gap: 10px; max-width: 90%; text-align: center; }
-  .kaart-hint.plaatsen { background: var(--magenta); font-size: 15px; animation: hint-puls 1.4s ease-in-out infinite; }
+  /* Rustigere kaart: alleen de kaarttegels minder fel en iets lichter (stippen blijven in kleur) */
+  #kaart .leaflet-tile-pane { filter: saturate(0.35) brightness(1.06) contrast(0.92); }
+  #kaart.plaatsmodus, #kaart.plaatsmodus .leaflet-grab, #kaart.plaatsmodus .leaflet-interactive, #kaart.plaatsmodus .leaflet-container { cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 48 48'%3E%3Ccircle cx='24' cy='24' r='21' fill='%23FFF77A' stroke='%23003D86' stroke-width='3'/%3E%3Cpath d='M24 13 L24 35 M13 24 L35 24' stroke='%23186ED5' stroke-width='5' stroke-linecap='round'/%3E%3C/svg%3E") 24 24, crosshair !important; }
+  .kaart-wrap.plaatsmodus-actief { box-shadow: inset 0 0 0 4px #FFF77A; border-radius: 0 0 28px 28px; }
+  .kaart-wrap.plaatsmodus-actief::after { content: ''; position: absolute; inset: 0; background: rgba(255,247,122,0.08); pointer-events: none; z-index: 500; }
+  .kaart-hint { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 600; background: #003D86; color: var(--wit); font-weight: 700; font-size: 14px; padding: 10px 20px; border-radius: 24px; box-shadow: 0 6px 20px rgba(0,0,0,0.25); display: flex; align-items: center; gap: 10px; max-width: 90%; text-align: center; }
+  .kaart-hint.plaatsen { background: #FFF77A; color: #003D86; font-size: 15px; animation: hint-puls 1.4s ease-in-out infinite; }
   @keyframes hint-puls { 0%,100%{transform:translateX(-50%) scale(1);} 50%{transform:translateX(-50%) scale(1.05);} }
   .kaart-hint .sluit-hint { background: rgba(255,255,255,0.2); border: none; color: var(--wit); width: 22px; height: 22px; border-radius: 50%; cursor: pointer; font-size: 13px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .kaart-hint.plaatsen .sluit-hint { background: rgba(0,61,134,0.12); color: #003D86; }
   .plaats-knop {
     position: absolute; top: 20px; left: 50%; transform: translateX(-50%); z-index: 600;
-    background: var(--magenta); color: var(--wit); border: none; border-radius: 16px;
+    background: #FFF77A; color: #003D86; border: none; border-radius: 16px;
     padding: 14px 32px; font-family: 'Tomarik', 'Trebuchet MS', 'Lucida Sans Unicode', Arial, sans-serif;
     font-size: 24px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em;
-    cursor: pointer; box-shadow: 6px 6px 0 #000; transition: transform 0.15s;
+    cursor: pointer; transition: transform 0.15s;
     display: flex; align-items: center; gap: 10px; white-space: nowrap;
   }
   .plaats-knop:hover { transform: translateX(-50%) translateY(-2px); }
   .plaats-knop:active { transform: translateX(-50%) translateY(-2px); }
-  .plaats-knop.actief { background: var(--zwart); }
-  .speeltuin-marker { display: flex; align-items: center; justify-content: center; border-radius: 50%; border: 3px solid var(--zwart); background: var(--magenta); color: var(--wit); font-family: 'Tomarik', 'Trebuchet MS', 'Lucida Sans Unicode', Arial, sans-serif; font-weight: 700; box-shadow: 0 3px 0 var(--zwart); transition: transform 0.15s; cursor: pointer; }
+  .plaats-knop.actief { background: #003D86; color: #fff; }
+  #plaats-knop-icon { color: #186ED5; font-weight: 800; }
+  .plaats-knop.actief #plaats-knop-icon { color: #fff; }
+  .speeltuin-marker { display: flex; align-items: center; justify-content: center; border-radius: 50%; border: 3px solid #fff; background: #1652D4; color: #fff; font-family: 'Tomarik', 'Trebuchet MS', 'Lucida Sans Unicode', Arial, sans-serif; font-weight: 700; line-height: 1; box-shadow: 0 2px 6px rgba(0, 61, 134, .35); transition: transform 0.15s; cursor: pointer; }
   .speeltuin-marker:hover { transform: scale(1.12); }
 
   .paneel-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.55); z-index: 2000; opacity: 0; pointer-events: none; transition: opacity 0.3s; display: flex; align-items: center; justify-content: center; padding: 24px; }
   .paneel-overlay.open { opacity: 1; pointer-events: auto; }
   .paneel { position: relative; width: 460px; max-width: 100%; max-height: 90vh; background: var(--wit); z-index: 2001; border-radius: 26px; transform: scale(0.92); opacity: 0; transition: transform 0.32s cubic-bezier(0.34,1.3,0.64,1), opacity 0.25s; overflow-y: auto; box-shadow: 0 24px 70px rgba(0,0,0,0.3); }
   .paneel.open { transform: scale(1); opacity: 1; }
-  .paneel-kop { background: var(--blauw); padding: 24px 28px 20px; position: relative; border-radius: 26px 26px 0 0; }
+  .paneel-kop { background: #186ED5; padding: 24px 28px 20px; position: relative; border-radius: 26px 26px 0 0; }
   .paneel-sluit { position: absolute; top: 18px; right: 18px; background: var(--wit); border: none; width: 38px; height: 38px; border-radius: 50%; cursor: pointer; font-size: 18px; color: var(--tekst); box-shadow: 0 2px 8px rgba(0,0,0,0.1); transition: transform 0.15s; }
   .paneel-sluit:hover { transform: rotate(90deg); }
-  .paneel-kop h3 { font-size: 25px; color: var(--zwart); margin-bottom: 4px; padding-right: 40px; }
-  .paneel-plaats { font-size: 14px; color: var(--magenta-donker); font-weight: 700; display: flex; align-items: center; gap: 5px; }
+  .paneel-kop h3 { font-size: 25px; color: #fff; margin-bottom: 4px; padding-right: 40px; }
+  .paneel-plaats { font-size: 14px; color: #fff; font-weight: 700; display: flex; align-items: center; gap: 5px; }
   .paneel-body { padding: 24px 28px 32px; }
-  .paneel-teller { background: var(--zwart); color: var(--wit); border-radius: 18px; padding: 18px; text-align: center; margin-bottom: 20px; position: relative; overflow: hidden; }
+  .paneel-teller { background: #003D86; color: var(--wit); border-radius: 18px; padding: 18px; text-align: center; margin-bottom: 20px; position: relative; overflow: hidden; }
   .paneel-teller::after { content: '🔔'; position: absolute; font-size: 80px; opacity: 0.08; right: -8px; bottom: -16px; }
-  .paneel-teller-getal { font-family: 'Tomarik', 'Trebuchet MS', 'Lucida Sans Unicode', Arial, sans-serif; font-size: 46px; font-weight: 700; color: var(--geel); line-height: 1; }
-  .paneel-teller-label { font-size: 13px; color: #B8B8B8; font-weight: 600; margin-top: 4px; }
+  .paneel-teller-getal { font-family: 'Tomarik', 'Trebuchet MS', 'Lucida Sans Unicode', Arial, sans-serif; font-size: 46px; font-weight: 700; color: #C9B8FF; line-height: 1; }
+  .paneel-teller-label { font-size: 13px; color: #fff; font-weight: 600; margin-top: 4px; }
   .deelnemers-titel { font-weight: 800; font-size: 14px; margin-bottom: 10px; color: var(--zwart); }
   .deelnemer-rij { display: flex; align-items: center; gap: 12px; padding: 9px 0; border-bottom: 1px solid var(--grijs); }
   .avatar { width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: 'Tomarik', 'Trebuchet MS', 'Lucida Sans Unicode', Arial, sans-serif; font-weight: 600; font-size: 13px; flex-shrink: 0; }
-  .avatar.naam { background: var(--blauw); color: #0C447C; }
+  .avatar.naam { background: var(--blauw); color: #003D86; }
   .avatar.anon { background: var(--grijs); color: #888; }
   .deelnemer-naam { flex: 1; font-weight: 700; font-size: 14px; }
   .deelnemer-tijd { font-size: 12px; color: var(--tekst-licht); font-weight: 600; }
@@ -98,34 +120,18 @@
   .veld { margin-bottom: 15px; }
   .veld label { display: block; font-size: 13px; font-weight: 800; color: var(--zwart); margin-bottom: 6px; }
   .veld input[type="text"], .veld input[type="email"] { width: 100%; padding: 12px 15px; border: 2px solid var(--grijs-rand); border-radius: 14px; font-family: 'Nunito', sans-serif; font-size: 15px; font-weight: 600; background: var(--grijs); color: var(--zwart); transition: border-color 0.2s, background 0.2s; }
-  .veld input:focus { outline: none; border-color: var(--magenta); background: var(--wit); }
+  .veld input:focus { outline: none; border-color: #003D86; background: var(--wit); }
   .checkbox-rij { display: flex; align-items: flex-start; gap: 10px; padding: 11px 14px; background: var(--grijs); border-radius: 14px; cursor: pointer; transition: background 0.2s; margin-bottom: 11px; }
   .checkbox-rij:hover { background: var(--blauw-licht); }
-  .checkbox-rij input { width: 20px; height: 20px; accent-color: var(--magenta); cursor: pointer; margin-top: 1px; flex-shrink: 0; }
+  .checkbox-rij input { width: 20px; height: 20px; accent-color: #FFF77A; cursor: pointer; margin-top: 1px; flex-shrink: 0; }
   .checkbox-rij span { font-size: 13px; font-weight: 600; color: var(--tekst); line-height: 1.4; }
-  .verstuur-knop { width: 100%; background: var(--magenta); color: var(--wit); border: none; border-radius: 18px; padding: 15px; font-family: 'Tomarik', 'Trebuchet MS', 'Lucida Sans Unicode', Arial, sans-serif; font-size: 20px; font-weight: 600; cursor: pointer; box-shadow: 0 6px 0 var(--magenta-donker); transition: transform 0.12s, box-shadow 0.12s; margin-top: 6px; display: flex; align-items: center; justify-content: center; gap: 8px; }
-  .verstuur-knop:hover { transform: translateY(-2px); box-shadow: 0 8px 0 var(--magenta-donker); }
-  .verstuur-knop:active { transform: translateY(3px); box-shadow: 0 3px 0 var(--magenta-donker); }
+  .verstuur-knop { width: 100%; background: #FFF77A; color: #003D86; border: none; border-radius: 18px; padding: 15px; font-family: 'Tomarik', 'Trebuchet MS', 'Lucida Sans Unicode', Arial, sans-serif; font-size: 20px; font-weight: 600; cursor: pointer; transition: transform 0.12s; margin-top: 6px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+  .verstuur-knop:hover { transform: translateY(-2px); }
+  .verstuur-knop:active { transform: translateY(1px); }
   .succes-blok { background: var(--geel); border-radius: 18px; padding: 24px; text-align: center; animation: pop 0.4s ease; }
   @keyframes pop { 0%{transform:scale(0.9);opacity:0;} 100%{transform:scale(1);opacity:1;} }
   .succes-blok h4 { font-family: 'Tomarik', 'Trebuchet MS', 'Lucida Sans Unicode', Arial, sans-serif; font-size: 24px; margin-bottom: 8px; }
   .succes-blok p { font-size: 14px; font-weight: 600; color: #333; }
-
-  .stats-balk { margin-top: 24px; }
-  .stats-inner { max-width: 700px; margin: 0 auto; display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; }
-  .stat-kaart { position: relative; border-radius: 24px; padding: 28px 22px; text-align: center; border: 3px solid var(--zwart); overflow: hidden; transition: transform 0.18s; }
-  .stat-kaart:hover { transform: translateY(-4px); }
-  .stat-kaart.blauw { background: var(--blauw); box-shadow: 6px 6px 0 #000; }
-  .stat-kaart.geel { background: var(--geel); box-shadow: 6px 6px 0 #000; }
-  .stat-kaart::after { content: ''; position: absolute; width: 120px; height: 120px; border-radius: 50%; background: rgba(255,255,255,0.25); top: -50px; right: -40px; }
-  .stat-icoon { width: 60px; height: 60px; border-radius: 50%; background: var(--wit); border: 3px solid var(--zwart); display: flex; align-items: center; justify-content: center; font-size: 30px; margin: 0 auto 14px; position: relative; z-index: 2; box-shadow: 0 3px 0 var(--zwart); }
-  .stat-getal { font-family: 'Tomarik', 'Trebuchet MS', 'Lucida Sans Unicode', Arial, sans-serif; font-size: 56px; font-weight: 700; line-height: 1; position: relative; z-index: 2; }
-  .stat-kaart.blauw .stat-getal { color: var(--magenta); }
-  .stat-kaart.geel .stat-getal { color: var(--zwart); }
-  .stat-label { font-size: 15px; font-weight: 700; margin-top: 6px; position: relative; z-index: 2; }
-  .stat-kaart.blauw .stat-label { color: var(--zwart); }
-  .stat-kaart.geel .stat-label { color: var(--zwart); }
-  @media (max-width: 640px) { .stats-inner { grid-template-columns: 1fr; gap: 16px; } .stat-kaart { box-shadow: 4px 4px 0 #000 !important; } }
 
   .gemeente-strip { background: var(--zwart); color: var(--wit); padding: 48px 24px; text-align: center; }
   .gemeente-strip-inner { max-width: 640px; margin: 0 auto; }
@@ -150,7 +156,8 @@
   }
   @media screen and (max-width: 768px) { .btn-header { display: none; } }
 </style>
-  <link rel="icon" type="image/svg+xml" href="/images/app-icon-v1.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="/images/favicon-192.png">
   <link rel="manifest" href="/manifest.webmanifest">
   <link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -158,14 +165,27 @@
   <meta name="apple-mobile-web-app-title" content="SpelBel">
   <meta name="theme-color" content="#EE7533">
 </head>
-<body>
+<body class="aanmeld-page">
 {{SITE_HEADER}}
 
-<section class="hero">
-  <div class="hero-inner">
-    <div class="hero-badge"><span class="puls"></span> Doe mee in jouw buurt</div>
-    <h1>Wij willen een <span class="magenta">SpelBel!</span></h1>
-    <p>Zoek jouw speelplek op de kaart en meld je aan. Zie wie er nog meer een SpelBel wil in de buurt. Hoe meer aanmeldingen, hoe groter de kans dat we samen met de gemeente een SpelBel kunnen regelen. Deel het dus met je buren!</p>
+<section class="aanmeld-hero">
+  <div class="aanmeld-hero-inner">
+    <div>
+      <h1>Meld je speeltuin<br>aan op de kaart</h1>
+      <p>Zoek jouw speelplek op de kaart en meld je aan. Zie wie er nog meer een SpelBel wil in de buurt. Hoe meer aanmeldingen, hoe groter de kans dat we samen met de gemeente een SpelBel kunnen regelen. Deel het dus met je buren!</p>
+    </div>
+    <div class="aanmeld-stats">
+      <div class="aanmeld-stat donker">
+        <div class="stat-icoon" aria-hidden="true">🙋</div>
+        <div class="stat-getal" id="stat-totaal">0</div>
+        <div class="stat-label">buurtbewoners willen ook een SpelBel</div>
+      </div>
+      <div class="aanmeld-stat licht">
+        <div class="stat-icoon" aria-hidden="true">🛝</div>
+        <div class="stat-getal" id="stat-speeltuinen">0</div>
+        <div class="stat-label">Speelplekken op de kaart</div>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -186,7 +206,7 @@
     <div class="kaart-wrap">
       <div id="kaart"></div>
       <button class="plaats-knop" id="plaats-knop" onclick="togglePlaatsen()">
-        <span id="plaats-knop-icon" style="color:#fff;font-weight:800;">+</span>
+        <span id="plaats-knop-icon">+</span>
         <span id="plaats-knop-tekst">Nieuwe speelplek plaatsen</span>
       </button>
       <div class="kaart-hint" id="kaart-hint">
@@ -196,27 +216,13 @@
     </div>
   </div>
 
-  <div class="stats-balk">
-    <div class="stats-inner">
-      <div class="stat-kaart blauw">
-        <div class="stat-icoon">🙋</div>
-        <div class="stat-getal" id="stat-totaal">0</div>
-        <div class="stat-label">buurtbewoners aangemeld</div>
-      </div>
-      <div class="stat-kaart geel">
-        <div class="stat-icoon">🛝</div>
-        <div class="stat-getal" id="stat-speeltuinen">0</div>
-        <div class="stat-label">speelplekken op de kaart</div>
-      </div>
-    </div>
-  </div>
 </div>
 
 <section class="gemeente-strip">
   <div class="gemeente-strip-inner">
     <h2>Werk je bij een gemeente?</h2>
     <p>Zie precies waar in jouw gemeente vraag is naar een Spel Bel. We gaan graag met je in gesprek over een pilot.</p>
-    <a href="mailto:info@scrollscrollscroll.nl" class="gemeente-btn">✉️ Neem contact op</a>
+    <a href="mailto:info@spelbel.nl" class="gemeente-btn">✉️ Neem contact op</a>
   </div>
 </section>
 
@@ -247,10 +253,25 @@ async function laad() {
   } catch (e) {
     speeltuinen = [];
   }
+  // Alleen lokaal en zonder echte data: voorbeeldstippen om het ontwerp te kunnen zien
+  if (!speeltuinen.length && ['localhost', '127.0.0.1'].includes(location.hostname)) speeltuinen = voorbeeldPlekken();
+}
+function voorbeeldPlekken() {
+  const nu = Date.now(), uur = 3600000;
+  const mensen = n => Array.from({ length: n }, (_, i) => ({ naam: i % 2 ? 'Anoniem' : 'Sanne de Vries', openbaar: i % 2 === 0, tijd: nu - (i + 1) * 5 * uur }));
+  return [
+    { id: 'voorbeeld-1', naam: 'Speeltuin Het Park',      plaats: 'Rotterdam', lat: 51.9128, lng: 4.4686, mensen: mensen(1) },
+    { id: 'voorbeeld-2', naam: 'Pleintje Afrikaanderwijk', plaats: 'Rotterdam', lat: 51.8975, lng: 4.4980, mensen: mensen(7) },
+    { id: 'voorbeeld-3', naam: 'Speelveld Lombok',        plaats: 'Utrecht',   lat: 52.0930, lng: 5.1012, mensen: mensen(1) },
+    { id: 'voorbeeld-4', naam: 'Speeltuin Oog in Al',     plaats: 'Utrecht',   lat: 52.0880, lng: 5.0880, mensen: mensen(3) },
+    { id: 'voorbeeld-5', naam: 'Schoolplein Zuiderpark',  plaats: 'Den Haag',  lat: 52.0570, lng: 4.2800, mensen: mensen(12) },
+    { id: 'voorbeeld-6', naam: 'Speelplek De Hoef',       plaats: 'Gouda',     lat: 52.0130, lng: 4.7100, mensen: mensen(1) },
+  ];
 }
 function initialen(naam) { if (naam === 'Anoniem') return '?'; return naam.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase(); }
 function tijdGeleden(t) { const s=Math.floor((Date.now()-t)/1000); if(s<60)return 'zojuist'; if(s<3600)return Math.floor(s/60)+' min'; if(s<86400)return Math.floor(s/3600)+' uur'; return Math.floor(s/86400)+' d'; }
-function markerGrootte(n) { return Math.min(34 + n*1.6, 64); }
+// 1 aanmelding = klein stipje; 2-9 = rondje met het aantal; vanaf 10 iets groter
+function markerGrootte(n) { return n === 1 ? 18 : n < 10 ? 30 : 36; }
 
 function initKaart() {
   kaart = L.map('kaart', { scrollWheelZoom: true, zoomControl: true }).setView([51.9, 4.9], 8);
@@ -272,7 +293,7 @@ function tekenMarkers() {
   Object.values(markers).forEach(m => kaart.removeLayer(m));
   speeltuinen.forEach(st => {
     const n = st.mensen.length, grootte = markerGrootte(n);
-    const icon = L.divIcon({ className:'', html:`<div class="speeltuin-marker" style="width:${grootte}px;height:${grootte}px;font-size:${Math.max(13,grootte*0.34)}px;">${n}</div>`, iconSize:[grootte,grootte], iconAnchor:[grootte/2,grootte/2] });
+    const icon = L.divIcon({ className:'', html:`<div class="speeltuin-marker" style="width:${grootte}px;height:${grootte}px;font-size:${Math.max(13,grootte*0.4)}px;">${n > 1 ? n : ''}</div>`, iconSize:[grootte,grootte], iconAnchor:[grootte/2,grootte/2] });
     const m = L.marker([st.lat, st.lng], { icon }).addTo(kaart);
     m.on('click', (e) => { if (plaatsModus) return; L.DomEvent.stopPropagation(e); openDetail(st.id); });
     markers[st.id] = m;
@@ -315,7 +336,7 @@ function kiesNieuweLocatie(lat, lng) {
   if (bestaand) { stopPlaatsen(); openDetail(bestaand.id); return; }
   nieuweCoord = { lat, lng };
   if (prikMarker) kaart.removeLayer(prikMarker);
-  prikMarker = L.marker([lat,lng], { icon: L.divIcon({ className:'', html:`<div style="width:28px;height:28px;border-radius:50% 50% 50% 0;background:#EC0E73;border:3px solid #1A1A1A;transform:rotate(-45deg);box-shadow:0 3px 0 rgba(0,0,0,0.3);"></div>`, iconSize:[28,28], iconAnchor:[14,28] }) }).addTo(kaart);
+  prikMarker = L.marker([lat,lng], { icon: L.divIcon({ className:'', html:`<div style="width:28px;height:28px;border-radius:50% 50% 50% 0;background:#FFF77A;border:3px solid #003D86;transform:rotate(-45deg);box-shadow:0 3px 0 rgba(0,0,0,0.3);"></div>`, iconSize:[28,28], iconAnchor:[14,28] }) }).addTo(kaart);
   stopPlaatsen();
   openFormulier(null, lat, lng);
 }

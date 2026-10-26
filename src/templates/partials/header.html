@@ -1,37 +1,90 @@
   <header class="site-header">
     <a class="logo" href="/"><img src="/images/logo.svg" alt="{{APP_NAME}}"></a>
-    <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav" aria-label="Menu">☰</button>
-    <nav class="site-nav" id="site-nav" aria-label="Hoofdmenu">
-      <a href="/#how">Hoe werkt het</a>
-      <a href="/app">Mijn bellen</a>
-      <details class="nav-drop">
+    <nav class="site-nav" aria-label="Hoofdmenu">
+      <a data-item="gemeenten" href="/voor-gemeenten">Voor gemeenten</a>
+      <details class="nav-drop" data-item="handleiding">
         <summary>Handleiding</summary>
         <div class="nav-menu">
-          <a href="/handleiding/belbazen">Voor Bel Bazen</a>
+          <a href="/handleiding/belbazen">Voor Belbazen</a>
           <a href="/handleiding/organisaties">Voor organisaties</a>
         </div>
       </details>
-      <details class="nav-drop">
+      <details class="nav-drop" data-item="inloggen">
         <summary>Inloggen</summary>
         <div class="nav-menu">
-          <a href="{{APP_URL}}/beheer">Als Bel Baas</a>
+          <a href="/app">Mijn bellen</a>
+          <a href="{{APP_URL}}/beheer">Als Belbaas</a>
           <a href="{{APP_URL}}/org">Als organisatie</a>
         </div>
       </details>
-      <a class="btn btn-header nav-cta" href="/wij-willen-een-spelbel">Wij willen een SpelBel!</a>
+      <!-- Wat niet meer past, verhuist hierheen (zie script) -->
+      <details class="nav-drop nav-more" hidden>
+        <summary>Meer</summary>
+        <div class="nav-menu">
+          <div class="nav-more-group" data-item="cta" hidden>
+            <a class="nav-more-cta" href="/wij-willen-een-spelbel">Wij willen een SpelBel!</a>
+          </div>
+          <div class="nav-more-group" data-item="gemeenten" hidden>
+            <a href="/voor-gemeenten">Voor gemeenten</a>
+          </div>
+          <div class="nav-more-group" data-item="handleiding" hidden>
+            <span class="nav-more-label">Handleiding</span>
+            <a href="/handleiding/belbazen">Voor Belbazen</a>
+            <a href="/handleiding/organisaties">Voor organisaties</a>
+          </div>
+          <div class="nav-more-group" data-item="inloggen" hidden>
+            <span class="nav-more-label">Inloggen</span>
+            <a href="/app">Mijn bellen</a>
+            <a href="{{APP_URL}}/beheer">Als Belbaas</a>
+            <a href="{{APP_URL}}/org">Als organisatie</a>
+          </div>
+        </div>
+      </details>
+      <a class="btn btn-header" data-cta href="/wij-willen-een-spelbel">Wij willen een SpelBel!</a>
     </nav>
-    <a class="btn btn-header header-cta" href="/wij-willen-een-spelbel">Wij willen een SpelBel!</a>
   </header>
   <script>
   (function () {
     var header = document.currentScript.previousElementSibling;
-    var toggle = header.querySelector('.nav-toggle');
+    var nav = header.querySelector('.site-nav');
+    var more = header.querySelector('.nav-more');
+    var items = Array.prototype.slice.call(nav.querySelectorAll(':scope > [data-item]'));
+    var moreLabel = more.querySelector('summary');
+    var cta = nav.querySelector('[data-cta]');
+    var ctaGroup = more.querySelector('.nav-more-group[data-item="cta"]');
     var drops = header.querySelectorAll('.nav-drop');
-    toggle.addEventListener('click', function () {
-      var open = header.classList.toggle('nav-open');
-      toggle.setAttribute('aria-expanded', String(open));
-      toggle.textContent = open ? '✕' : '☰';
-    });
+
+    function overflowing() {
+      var pad = parseFloat(getComputedStyle(header).paddingRight) || 0;
+      return nav.getBoundingClientRect().right > header.getBoundingClientRect().right - pad + 1;
+    }
+    function group(item) { return more.querySelector('.nav-more-group[data-item="' + item.dataset.item + '"]'); }
+
+    // Priority+: past alles niet, dan gaan de knoppen van rechts naar links één voor één in "Meer".
+    // Past zelfs "Meer" + de gele knop niet, dan gaat ook de gele knop erin en heet "Meer" voortaan "Menu".
+    function fit() {
+      more.hidden = true;
+      cta.hidden = false;
+      ctaGroup.hidden = true;
+      moreLabel.textContent = 'Meer';
+      items.forEach(function (item) { item.hidden = false; group(item).hidden = true; });
+      if (!overflowing()) return;
+      more.hidden = false;
+      for (var i = items.length - 1; i >= 0 && overflowing(); i--) {
+        items[i].hidden = true;
+        items[i].open = false;
+        group(items[i]).hidden = false;
+      }
+      if (overflowing()) {
+        cta.hidden = true;
+        ctaGroup.hidden = false;
+        moreLabel.textContent = 'Menu';
+      }
+    }
+    fit();
+    window.addEventListener('resize', fit);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(fit);
+
     // One dropdown at a time; outside a click or on Escape, none.
     drops.forEach(function (d) {
       d.addEventListener('toggle', function () { if (d.open) drops.forEach(function (o) { if (o !== d) o.open = false; }); });

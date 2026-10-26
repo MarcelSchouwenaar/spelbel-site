@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Belbaas welkomstmail sturen — SpelBel</title>
+<meta name="robots" content="noindex,nofollow">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;600;700&display=swap">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #e8f5f2;
+    font-family: 'Hanken Grotesk', -apple-system, sans-serif;
+    color: #1a1a1a;
+    padding: 40px 16px 80px;
+    min-height: 100vh;
+  }
+  .card {
+    max-width: 540px;
+    margin: 0 auto;
+    background: #fff;
+    border-radius: 20px;
+    padding: 40px 40px 36px;
+    box-shadow: 0 4px 24px rgba(0,0,0,.08);
+  }
+  .brand {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: #F07835;
+    margin-bottom: 8px;
+  }
+  h1 {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 28px;
+    line-height: 1.25;
+  }
+  .field { margin-bottom: 20px; }
+  label {
+    display: block;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    color: #5a6760;
+    margin-bottom: 6px;
+  }
+  label .opt {
+    font-weight: 400;
+    text-transform: none;
+    letter-spacing: 0;
+    color: #9aaba8;
+    font-size: 12px;
+  }
+  input[type="text"], input[type="email"], input[type="date"], input[type="time"], input[type="url"] {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1.5px solid #d6dbd9;
+    border-radius: 10px;
+    font-family: inherit;
+    font-size: 15px;
+    color: #1a1a1a;
+    background: #fff;
+    outline: none;
+    transition: border-color .15s;
+  }
+  input:focus { border-color: #F07835; }
+  .row { display: flex; gap: 12px; }
+  .row .field { flex: 1; }
+  .divider {
+    border: none;
+    border-top: 1.5px solid #e8ecea;
+    margin: 28px 0;
+  }
+  .variant-hint {
+    background: #FDF1E8;
+    border-radius: 10px;
+    padding: 14px 18px;
+    font-size: 13px;
+    line-height: 1.5;
+    color: #8a4a1a;
+    margin-bottom: 24px;
+  }
+  .variant-hint strong { color: #D9601A; }
+  .btn {
+    display: block;
+    width: 100%;
+    padding: 14px;
+    background: #F07835;
+    color: #fff;
+    font-family: inherit;
+    font-size: 16px;
+    font-weight: 700;
+    border: none;
+    border-radius: 99px;
+    cursor: pointer;
+    transition: background .15s;
+  }
+  .btn:hover { background: #d9601a; }
+  .btn:disabled { background: #c5c5c5; cursor: not-allowed; }
+  #status {
+    margin-top: 16px;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 600;
+    min-height: 20px;
+  }
+  #status.ok { color: #1a7a4a; }
+  #status.err { color: #c0392b; }
+  @media (max-width: 480px) {
+    .card { padding: 28px 20px 24px; }
+    .row { flex-direction: column; gap: 0; }
+  }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="brand">🔔 SpelBel — intern</div>
+  <h1>Belbaas welkomstmail sturen</h1>
+
+  <div class="variant-hint">
+    Laat <strong>Datum</strong> leeg voor <strong>Variant B</strong> (datum onbekend).<br>
+    Vul een datum in voor <strong>Variant A</strong> (datum + tijd bekend).
+  </div>
+
+  <form id="form" enctype="multipart/form-data">
+    <input type="hidden" name="token" value="{{TOKEN}}">
+
+    <div class="field">
+      <label for="naam">Naam Belbaas</label>
+      <input type="text" id="naam" name="naam" placeholder="bijv. Sarah" required>
+    </div>
+
+    <div class="field">
+      <label for="email">E-mailadres</label>
+      <input type="email" id="email" name="email" placeholder="belbaas@email.nl" required>
+    </div>
+
+    <div class="field">
+      <label for="code">Inlogcode</label>
+      <input type="text" id="code" name="code" placeholder="bijv. BELBR-42" required>
+    </div>
+
+    <div class="field">
+      <label for="link">Link naar platform</label>
+      <input type="url" id="link" name="link" value="https://app.spelbel.nl/start" required>
+    </div>
+
+    <div class="field">
+      <label for="plek">Naam van de plek <span class="opt">— bijv. Speeltuin de Lindeboom</span></label>
+      <input type="text" id="plek" name="plek" placeholder="bijv. speeltuin aan de Kerkstraat">
+    </div>
+
+    <div class="field">
+      <label for="flyer">Flyer als PDF <span class="opt">— optioneel bijlage</span></label>
+      <input type="file" id="flyer" name="flyer" accept="application/pdf" style="width:100%;padding:8px 0;font-size:14px;color:#5a6760;">
+    </div>
+
+    <hr class="divider">
+
+    <div class="row">
+      <div class="field">
+        <label for="datum">Datum opening <span class="opt">— optioneel</span></label>
+        <input type="date" id="datum" name="datum">
+      </div>
+      <div class="field">
+        <label for="tijd">Tijdstip <span class="opt">— optioneel</span></label>
+        <input type="time" id="tijd" name="tijd">
+      </div>
+    </div>
+
+    <button type="submit" class="btn" id="btn">Mail versturen</button>
+    <div id="status"></div>
+  </form>
+</div>
+
+<script>
+  const form = document.getElementById('form');
+  const btn  = document.getElementById('btn');
+  const stat = document.getElementById('status');
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    btn.disabled = true;
+    btn.textContent = 'Versturen…';
+    stat.textContent = '';
+    stat.className = '';
+
+    const datum = form.datum.value;
+    const datumFormatted = datum
+      ? new Date(datum).toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' })
+      : '';
+
+    const fd = new FormData();
+    fd.append('token', form.token.value);
+    fd.append('naam',  form.naam.value);
+    fd.append('email', form.email.value);
+    fd.append('code',  form.code.value);
+    fd.append('link',  form.link.value);
+    fd.append('plek',  form.plek.value);
+    fd.append('datum', datumFormatted);
+    fd.append('tijd',  form.tijd.value);
+    if (form.flyer.files[0]) fd.append('flyer', form.flyer.files[0]);
+
+    try {
+      const res = await fetch('/api/send-belbaas', { method: 'POST', body: fd });
+      const json = await res.json();
+      if (res.ok) {
+        stat.textContent = '✓ Mail verstuurd naar ' + form.email.value;
+        stat.className = 'ok';
+        form.reset();
+        form.token.value = '{{TOKEN}}';
+      } else {
+        throw new Error(json.error || 'Onbekende fout');
+      }
+    } catch (err) {
+      stat.textContent = '✗ Fout: ' + err.message;
+      stat.className = 'err';
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Mail versturen';
+    }
+  });
+</script>
+</body>
+</html>

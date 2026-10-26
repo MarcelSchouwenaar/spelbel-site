@@ -7,7 +7,8 @@
   <meta name="description" content="{{APP_NAME}} stuurt je een bericht als de bel op de speeltuin gaat: een pushmelding in de SpelBel-app of in je browser.">
   <link rel="stylesheet" href="/css/app.css">
   <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;600;700;800&display=swap" rel="stylesheet">
-  <link rel="icon" type="image/svg+xml" href="/images/app-icon-v1.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="/images/favicon-192.png">
   <link rel="manifest" href="/manifest.webmanifest">
   <link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -15,41 +16,50 @@
   <meta name="apple-mobile-web-app-title" content="SpelBel">
   <meta name="theme-color" content="#EE7533">
 </head>
-<body>
+<body class="home-page">
 {{SITE_HEADER}}
 
   <section class="hero">
     <div class="hero-text">
       <h2>Druk op de bel<br>&amp; Speel samen!</h2>
-      <p>De SpelBel stuurt een seintje naar alle ouders in de buurt zodra er iemand buiten wil spelen. Éen druk op de knop, en de hele straat weet het.</p>
+      <p>Drukt een kind op de SpelBel in de speeltuin? Dan krijgen alle aangemelde ouders een berichtje: "Er wordt nu buitengespeeld!" Zo weet de hele buurt dat er iemand is om mee te spelen.</p>
+      <a class="btn-hero" href="/wij-willen-een-spelbel">Wij willen een SpelBel!</a>
+      <div class="jb-badge">
+        <a href="https://www.jantjebeton.nl" target="_blank" rel="noopener" tabindex="-1" aria-hidden="true"><img src="/images/jantjebeton-logo.png" alt=""></a>
+        <span>SpelBel werkt samen met <a href="https://www.jantjebeton.nl" target="_blank" rel="noopener">Jantje Beton</a></span>
+      </div>
     </div>
-    <img src="/images/spelbel-foto-2.png" alt="De eerste SpelBel!">
+    <picture class="hero-foto">
+      <source media="(max-width: 768px)" srcset="/images/hero-small.jpg">
+      <img src="/images/spelbel-hero.jpg" alt="De eerste SpelBel!">
+    </picture>
   </section>
 
-  <section class="cta">
-    <div class="cta-inner">
-      <h3>Willen kinderen in jouw buurt ook meer buiten spelen?</h3>
-      <p>Een SpelBel zet kinderen in beweging en verbindt buren. Vraag hem aan voor jouw wijk</p>
-      <a class="btn" href="/wij-willen-een-spelbel">Wij willen een SpelBel!</a>
-    </div>
-  </section>
-
-  <section class="problem">
-    <div class="problem-inner">
-      <h2>Wat is het probleem?</h2>
-      <div class="stat-cards">
-        <div class="stat-card">
-          <div class="stat-num">55%</div>
-          <p class="stat-text">van de kinderen wil vaker buiten spelen dan ze nu doen.</p>
-          <p class="stat-source">Jantje Beton, 2026</p>
+  <section class="tadaaa">
+    <div class="tadaaa-inner">
+      <h2>Tadaaa! De SpelBel!</h2>
+      <div class="tadaaa-cards">
+        <div class="tadaaa-card">
+          <img src="/images/tadaaa-bord.jpg" alt="Het SpelBel-bord aan een paal">
+          <h3>Het bord</h3>
+          <p>Op de speelplek komt een bord te hangen. Herkenbaar voor kinderen en ouders, en gemaakt om buiten te hangen.</p>
         </div>
-        <div class="stat-card">
-          <div class="stat-num">#1</div>
-          <p class="stat-text">reden om niet naar buiten te gaan: Te weinig andere kinderen buiten.</p>
-          <p class="stat-source">Jantje Beton, 2026</p>
+        <div class="tadaaa-card">
+          <img src="/images/tadaaa-knop.jpg" alt="De grote knop op het bord">
+          <h3>De knop</h3>
+          <p>In het midden van het bord zit een grote knop. Een kind drukt en alle aangemelde ouders en verzorgers ontvangen een bericht: "Er word nu buitengespeeld!".</p>
+        </div>
+        <div class="tadaaa-card">
+          <img src="/images/tadaaa-qr.jpg" alt="De QR-code op het bord">
+          <h3>De QR code</h3>
+          <p>Ouders of verzorgers scannen hem één keer, downloaden de app en melden zich aan om berichten te ontvangen.</p>
         </div>
       </div>
     </div>
+  </section>
+
+  <section class="foto-blok">
+    <img src="/images/spelbel-schommels.jpg" alt="Kinderen op de schommels naast een paal met de SpelBel">
   </section>
 
   <section class="how" id="how">
@@ -87,53 +97,63 @@
     </div>
   </section>
 
-  <section class="video-section">
-    <div class="video-inner">
-      <h3>Zie de SpelBel in actie</h3>
-      <div class="video-embed">
-        <iframe src="https://www.youtube.com/embed/Dh5doxr_VLA" title="Zie de SpelBel in actie" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+  <section class="problem">
+    <div class="problem-inner">
+      <h2>Wat is het probleem?</h2>
+      <div class="stat-cards">
+        <div class="stat-card">
+          <div class="stat-num">55%</div>
+          <p class="stat-text">van de kinderen wil vaker buiten spelen dan ze nu doen.</p>
+          <p class="stat-source">Jantje Beton, 2026</p>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num">#1</div>
+          <p class="stat-text">reden om niet naar buiten te gaan: Te weinig andere kinderen buiten.</p>
+          <p class="stat-source">Jantje Beton, 2026</p>
+        </div>
       </div>
     </div>
   </section>
 
   <section class="faq" id="faq">
     <div class="faq-inner">
-      <h2>Best veelgestelde vragen</h2>
+      <h2>Veelgestelde vragen</h2>
       <div class="accordion">
         <details>
           <summary><h3>Voor wie is de SpelBel?</h3></summary>
           <div class="accordion-content">
-            <p>De SpelBel is er voor iedereen die meer kinderen buiten wil laten spelen. Gemeenten kunnen de SpelBel laten installeren in hun speeltuinen. Maar ook als buurtbewoner kun je samen met mensen uit je wijk een SpelBel aanvragen. We helpen je graag op weg.</p>
-          </div>
-        </details>
-        <details>
-          <summary><h3>Wat kost een SpelBel?</h3></summary>
-          <div class="accordion-content">
-            <p>We zijn momenteel volop aan het testen en werken aan een nieuwe versie. Na de zomer weten we meer over de prijs en de mogelijkheden. Schrijf je in voor onze nieuwsbrief en blijf op de hoogte! <a href="https://05429a6a.sibforms.com/serve/MUIFAGtScEacwJ_INYphqgMXzwtrCjmLcBiIKa4ToBHrGd0Mz_QTOBSWjbFkfws592HgCzSQhTVC4G0e9giGd4Boirs3QZhhvhQw43so12y6Z9_myTVBKrL_mnUg2fQwT9z3Rh0D1k5hxNoBynGdZbs6M_T_9eJGcakkoLoUUpn-hamxAgDHEiQCQd-i7uFtEPjD56_-9l-Y0MRmbg==" target="_blank" rel="noopener">Meld je aan</a></p>
+            <p>De SpelBel is er voor iedereen die meer kinderen buiten wil laten spelen. Gemeenten kunnen de SpelBel laten installeren in hun speeltuinen. Maar ook als buurtbewoner kun je samen met mensen uit je wijk <a href="/wij-willen-een-spelbel">een SpelBel aanvragen</a>. We helpen je graag op weg.</p>
           </div>
         </details>
         <details>
           <summary><h3>Welke rol kan een gemeente spelen?</h3></summary>
           <div class="accordion-content">
-            <p>Gemeenten kunnen een of meerdere SpelBellen afnemen en zelf bepalen waar ze komen te hangen. Bij elke SpelBel hoort een Spel Baas uit de wijk die de bel beheert en zorgt voor een feestelijke opening. De gemeente bepaalt de locaties en kan de bellen ook verplaatsen naar een andere speeltuin als dat wenselijk is.</p>
+            <p>Gemeenten kunnen een of meerdere SpelBellen afnemen en zelf bepalen waar ze komen te hangen. Bij elke SpelBel hoort een Belbaas uit de wijk die de bel beheert en zorgt voor een feestelijke opening.</p>
           </div>
         </details>
         <details>
           <summary><h3>Krijg je niet de hele dag door berichten?</h3></summary>
           <div class="accordion-content">
-            <p>Nee! De SpelBel kan maar één keer per 5 minuten worden ingedrukt. Je krijgt dus alleen een berichtje als er écht iemand buiten staat te spelen. Belletje-lellen werkt niet. 😄</p>
+            <p>Nee! Je kunt de SpelBel zo vaak indrukken als je wilt, maar er gaat maar één keer per 5 minuten een berichtje uit. Je krijgt dus alleen een berichtje als er écht iemand buiten staat te spelen. Belletje-lellen werkt niet. 😄</p>
           </div>
         </details>
         <details>
           <summary><h3>Kun je je afmelden op dagen dat je niet thuis bent?</h3></summary>
           <div class="accordion-content">
-            <p>Ja, dat kan! Op dit moment kun je je afmelden voor een hele dag. In de toekomst werken we aan nog meer slimme functies die het gebruik nog leuker maken. 🔔</p>
+            <p>Ja, dat kan! Je kunt je afmelden voor 2 uur of voor de hele dag. In de toekomst werken we aan nog meer slimme functies die het gebruik nog leuker maken. 🔔</p>
           </div>
         </details>
         <details>
           <summary><h3>Wat is er nodig om een SpelBel te installeren?</h3></summary>
           <div class="accordion-content">
-            <p>Voor de installatie zijn 2 dingen nodig: een geschikte plek in of bij een speeltuin en een Spel Baas uit de wijk die de bel beheert. Wij regelen de rest.</p>
+            <p>Voor een SpelBel zijn 4 dingen nodig:</p>
+            <ul>
+              <li>een goede plek in of bij een speeltuin;</li>
+              <li>enthousiaste buurtbewoners;</li>
+              <li>een gemeente die de SpelBel wil financieren;</li>
+              <li>een Belbaas: iemand uit de wijk die de bel beheert.</li>
+            </ul>
+            <p>Wij regelen de rest.</p>
           </div>
         </details>
         <details>
@@ -143,9 +163,9 @@
           </div>
         </details>
         <details>
-          <summary><h3>Wat is een Spel Baas?</h3></summary>
+          <summary><h3>Wat is een Belbaas?</h3></summary>
           <div class="accordion-content">
-            <p>De Spel Baas is iemand uit de wijk die de SpelBel beheert. Hij of zij zorgt voor een feestelijke opening zodat de hele buurt weet dat de bel er is, en is het eerste aanspreekpunt als er iets is. De Spel Baas ontvangt van ons een pakket met alles wat nodig is om een vliegende start te maken.</p>
+            <p>De Belbaas is iemand uit de wijk die de SpelBel beheert. Hij of zij zorgt voor een feestelijke opening zodat de hele buurt weet dat de bel er is, en is het eerste aanspreekpunt als er iets is. De Belbaas ontvangt van ons een pakket met alles wat nodig is om een vliegende start te maken.</p>
           </div>
         </details>
       </div>
@@ -236,6 +256,52 @@ if (new URLSearchParams(window.location.search).get('nieuwsbrief') === 'bevestig
   document.getElementById('nw-melding').textContent = '✅ Je bent aangemeld! Welkom bij SpelBel.';
   history.replaceState({}, '', '/');
 }
+</script>
+<script>
+// Hero-kop: lettergrootte zo dat de langste regel precies de breedte van het tekstvak vult (maar niet breder dan zijn max-width).
+// De knop eronder schaalt mee, maar wordt nooit kleiner dan zijn maat in de CSS.
+(function () {
+  var h2 = document.querySelector('.hero h2');
+  if (!h2) return;
+  var box = h2.parentElement;
+  var btn = box.querySelector('.btn-hero');
+  function fit() {
+    var cs = getComputedStyle(box);
+    var avail = box.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+    var max = parseFloat(getComputedStyle(h2).maxWidth);
+    if (max) avail = Math.min(avail, max);
+    h2.style.fontSize = '100px';
+    h2.style.maxWidth = 'none';
+    h2.style.width = 'max-content';
+    var w = h2.offsetWidth;
+    h2.style.width = '';
+    h2.style.maxWidth = '';
+    if (w <= 0) return;
+    var size = Math.floor(100 * avail / w * 10) / 10;
+    h2.style.fontSize = size + 'px';
+    if (btn) {
+      // Ondergrens = de maat uit de CSS (24px, op 768px en smaller 16px)
+      btn.style.fontSize = '';
+      var min = parseFloat(getComputedStyle(btn).fontSize);
+      btn.style.fontSize = Math.max(min, size * 0.4) + 'px';
+    }
+  }
+  fit();
+  if ('ResizeObserver' in window) new ResizeObserver(fit).observe(box);
+  else window.addEventListener('resize', fit);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(fit);
+})();
+</script>
+<script>
+// Header krijgt een achtergrond zodra de hero uit beeld is
+(function () {
+  var header = document.querySelector('.site-header');
+  var hero = document.querySelector('.hero');
+  if (!header || !hero || !('IntersectionObserver' in window)) return;
+  new IntersectionObserver(function (entries) {
+    header.classList.toggle('past-hero', !entries[0].isIntersecting);
+  }, { rootMargin: '-' + header.offsetHeight + 'px 0px 0px 0px' }).observe(hero);
+})();
 </script>
 </body>
 </html>

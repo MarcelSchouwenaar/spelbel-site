@@ -69,6 +69,7 @@ app.get('/', (req, res) => {
     const [emailUser, emailDomain] = (process.env.CONTACT_EMAIL || '@').split('@');
     res.send(render('home.html', {
         APP_NAME,
+        APP_URL,
         CONTACT_EMAIL_USER:   emailUser,
         CONTACT_EMAIL_DOMAIN: emailDomain,
     }));
@@ -76,18 +77,23 @@ app.get('/', (req, res) => {
 
 // Wij willen een SpelBel (signup map page)
 app.get('/wij-willen-een-spelbel', (req, res) => {
-    res.send(render('wij-willen-een-spelbel.html', { APP_NAME }));
+    res.send(render('wij-willen-een-spelbel.html', { APP_NAME, APP_URL }));
+});
+
+app.get('/voor-gemeenten', (req, res) => {
+    const [vgEmailUser, vgEmailDomain] = (process.env.CONTACT_EMAIL || '@').split('@');
+    res.send(render('voor-gemeenten.html', { APP_NAME, APP_URL, CONTACT_EMAIL_USER: vgEmailUser, CONTACT_EMAIL_DOMAIN: vgEmailDomain }));
 });
 
 // Thank you page
 app.get('/thankyou', (req, res) => {
-    res.send(render('thankyou.html', { APP_NAME }));
+    res.send(render('thankyou.html', { APP_NAME, APP_URL }));
 });
 
 // Privacy policy
 app.get('/privacy', (req, res) => {
     const [emailUser, emailDomain] = (process.env.CONTACT_EMAIL || '@').split('@');
-    res.send(render('privacy.html', { APP_NAME, CONTACT_EMAIL_USER: emailUser, CONTACT_EMAIL_DOMAIN: emailDomain }));
+    res.send(render('privacy.html', { APP_NAME, APP_URL, CONTACT_EMAIL_USER: emailUser, CONTACT_EMAIL_DOMAIN: emailDomain }));
 });
 
 // ── Belbaas admin ─────────────────────────────────────────
@@ -109,7 +115,7 @@ app.post('/api/send-belbaas', uploadBelbaas.single('flyer'), async (req, res) =>
     if (!adminToken || token !== adminToken) {
         return res.status(403).json({ error: 'Unauthorized' });
     }
-    const { naam, email, code, link, datum, tijd } = req.body || {};
+    const { naam, email, code, link, plek, datum, tijd } = req.body || {};
     if (!naam || !email || !code || !link) {
         return res.status(400).json({ error: 'naam, email, code en link zijn verplicht' });
     }
@@ -119,7 +125,7 @@ app.post('/api/send-belbaas', uploadBelbaas.single('flyer'), async (req, res) =>
         type: 'application/pdf',
     } : null;
     try {
-        await sendBelbaasEmail({ naam, email, code, link, datum, tijd, bijlage });
+        await sendBelbaasEmail({ naam, email, code, link, plek, datum, tijd, bijlage });
         res.json({ ok: true });
     } catch (err) {
         console.error('[belbaas-sturen] send failed:', err.message);
