@@ -12,7 +12,7 @@ const express = require('express');
 const { parentPagesProxy, isParentRoute } = require('../src/proxy');
 
 test('routes exactly the parent paths to the app', () => {
-    const forwarded = ['/bel/abc', '/bel/12', '/app', '/push/settings',
+    const forwarded = ['/bel/abc', '/bel/12', '/app', '/app/vragen', '/push/settings',
         '/manifest.webmanifest', '/sw.js', '/app-assets/css/parent.css', '/app-assets/images/logo.svg',
         '/_expo/static/js/web/entry-62d27081.js',
         '/.well-known/apple-app-site-association', '/.well-known/assetlinks.json'];
