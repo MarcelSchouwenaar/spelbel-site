@@ -11,6 +11,7 @@ const https = require('https');
 const PARENT_ROUTES = [
     /^\/bel\/[^/]+$/,
     /^\/app$/,
+    /^\/app\/vragen$/,     // Veelgestelde vragen in the web app
     /^\/push\/settings$/,
     /^\/manifest\.webmanifest$/,
     /^\/sw\.js$/,
