@@ -6,7 +6,7 @@ const { render } = require('./lib/render');
 const { parentPagesProxy } = require('./proxy');
 const { pool, init: initDb, purgeOld } = require('./lib/db');
 const multer = require('multer');
-const { sendVerificationEmail, sendNewsletterVerificationEmail, sendOwnerNotificationEmail, addToMailingList, sendWelcomeEmail, sendBelbaasEmail } = require('./lib/email');
+const { sendVerificationEmail, sendNewsletterVerificationEmail, sendOwnerNotificationEmail, addToMailingList, sendWelcomeEmail, sendBelbaasEmail, sendBrochureRequestEmail } = require('./lib/email');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -270,6 +270,26 @@ app.get('/api/verify/:token', async (req, res) => {
 });
 
 // Newsletter signup from homepage — sends verification email
+// Brochure-aanvraag vanaf Voor gemeenten → mail naar het contactadres
+app.post('/api/brochure', async (req, res) => {
+    const { gemeente, naam, functie, email, telefoon, vraag, website } = req.body || {};
+    if (website) return res.json({ ok: true }); // honeypot: bots vullen dit verborgen veld in
+    if (!gemeente || !naam || !email || !String(email).includes('@')) {
+        return res.status(400).json({ error: 'Vul je gemeente, naam en een geldig e-mailadres in.' });
+    }
+    const kort = (v, n) => String(v || '').trim().slice(0, n);
+    try {
+        await sendBrochureRequestEmail({
+            gemeente: kort(gemeente, 120), naam: kort(naam, 120), functie: kort(functie, 120),
+            email: kort(email, 200), telefoon: kort(telefoon, 40), vraag: kort(vraag, 2000),
+        });
+        res.json({ ok: true });
+    } catch (err) {
+        console.error('[API] /api/brochure error:', err.message);
+        res.status(500).json({ error: 'Versturen mislukt.' });
+    }
+});
+
 app.post('/api/newsletter', async (req, res) => {
     const { email } = req.body || {};
     if (!email || !email.includes('@')) return res.status(400).json({ error: 'Ongeldig e-mailadres.' });

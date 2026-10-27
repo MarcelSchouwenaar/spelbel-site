@@ -205,7 +205,7 @@ a:hover {
 .hero-text {
   color: #fff;
   text-align: left;
-  padding: 60px 80px 80px 80px;
+  padding: 160px 80px 80px 80px;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -910,6 +910,11 @@ body.auth-page {
 .vg-logos img { max-width: 100%; max-height: 80px; object-fit: contain; }
 .vg-logos span { font-family: 'Tomarik', 'Trebuchet MS', Arial, sans-serif; font-size: 1.4rem; text-transform: uppercase; }
 .vg-foto-staand { display: block; width: 100%; max-height: 560px; aspect-ratio: 4 / 5; object-fit: cover; object-position: center 60%; border-radius: 24px; }
+.vg-privacy { background: #E0DCFF; }
+.vg-privacy-kaart { background: #fff; border-radius: 24px; padding: 28px; }
+.vg-privacy-kaart p { margin: 0; }
+.vg-privacy-link { margin: 28px 0 0 !important; font-weight: 800; }
+.vg-kaarten-2 { grid-template-columns: repeat(2, 1fr); }
 .vg-plekken { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
 .vg-plek p { margin: 0; }
 .vg-opening { font-weight: 800; font-size: .9rem; color: #3A8CEE; margin-top: 6px !important; }
@@ -925,6 +930,9 @@ body.auth-page {
 .vg-form input:focus, .vg-form textarea:focus { outline: none; border-color: #003D86; }
 .vg-form-rij { display: flex; gap: 18px; }
 .vg-form .vg-knop { align-self: flex-start; border: 0; cursor: pointer; padding: 14px 28px; }
+.vg-honeypot { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
+.vg-melding { margin: 0; font-weight: 800; min-height: 1.5em; }
+.vg-form { position: relative; }
 .vg-form .vg-klein { margin: 0; color: #5A6360; }
 
 @media screen and (max-width: 900px) {
