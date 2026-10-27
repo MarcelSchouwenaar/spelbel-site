@@ -1027,6 +1027,7 @@ body.auth-page {
 .accordion-content p {
   margin: 0;
 }
+.accordion-content p + p { margin-top: 12px; }
 
 .accordion-content a {
   color: #DD4A93;
@@ -1037,6 +1038,7 @@ body.auth-page {
 /* ── News Section with Blobbly Images ──────────────────────────────────── */
 .news {
   padding: 56px 24px;
+  color: #003D86;
 }
 
 .news-inner {
@@ -1103,12 +1105,12 @@ body.auth-page {
   font-weight: 700;
   font-size: 1rem;
   margin-bottom: 8px;
-  color: #111;
+  color: #003D86;
   text-decoration: underline;
 }
 
 .news-hero-content p {
-  color: #333;
+  color: #003D86;
   font-weight: 600;
   font-size: 0.95rem;
   line-height: 1.4;
@@ -1124,7 +1126,7 @@ body.auth-page {
 }
 
 .news-other a {
-  color: #111;
+  color: #003D86;
   text-decoration: underline;
   font-weight: 600;
   text-underline-offset: 4px;
@@ -1132,5 +1134,5 @@ body.auth-page {
 }
 
 .news-other a:hover {
-  color: #DD4A93;
+  color: #1652D4;
 }

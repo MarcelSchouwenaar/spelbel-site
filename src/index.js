@@ -100,8 +100,14 @@ app.get('/privacy', (req, res) => {
 // ── Belbaas admin ─────────────────────────────────────────
 // Simple form to send the welcome email to a new Belbaas.
 // Protected by ADMIN_TOKEN env var; keep this URL private.
+// Lokaal (niet op Railway, via localhost) mag het zonder token; online blijft de token verplicht.
+function isLocalDev(req) {
+    return !process.env.RAILWAY_ENVIRONMENT_NAME && !process.env.RAILWAY_ENVIRONMENT
+        && ['localhost', '127.0.0.1'].includes(req.hostname);
+}
+
 app.get('/belbaas-sturen', (req, res) => {
-    const token = req.query.token || '';
+    const token = isLocalDev(req) ? (process.env.ADMIN_TOKEN || '') : (req.query.token || '');
     const adminToken = process.env.ADMIN_TOKEN || '';
     if (!adminToken || token !== adminToken) {
         return res.status(403).send('Toegang geweigerd. Voeg ?token=... toe aan de URL.');
@@ -111,8 +117,8 @@ app.get('/belbaas-sturen', (req, res) => {
 
 const uploadBelbaas = multer({ storage: multer.memoryStorage(), limits: { fileSize: 10 * 1024 * 1024 } });
 app.post('/api/send-belbaas', uploadBelbaas.single('flyer'), async (req, res) => {
-    const token = req.body?.token || req.headers['x-admin-token'] || '';
     const adminToken = process.env.ADMIN_TOKEN || '';
+    const token = isLocalDev(req) ? adminToken : (req.body?.token || req.headers['x-admin-token'] || '');
     if (!adminToken || token !== adminToken) {
         return res.status(403).json({ error: 'Unauthorized' });
     }
@@ -283,7 +289,7 @@ app.post('/api/newsletter', async (req, res) => {
              ON CONFLICT DO NOTHING`,
             [email.toLowerCase(), token]
         );
-        const verifyUrl = `${APP_URL}/api/newsletter/verify/${token}`;
+        const verifyUrl = `${req.protocol}://${req.get('host')}/api/newsletter/verify/${token}`;
         await sendNewsletterVerificationEmail({ email, verifyUrl });
         res.json({ ok: true });
     } catch (err) {
