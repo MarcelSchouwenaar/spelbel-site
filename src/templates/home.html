@@ -290,8 +290,10 @@ document.getElementById('nw-email').addEventListener('keydown', e => { if (e.key
 if (new URLSearchParams(window.location.search).get('nieuwsbrief') === 'bevestigd') {
   document.getElementById('nw-melding').textContent = '✅ Je bent aangemeld! Welkom bij SpelBel.';
   history.replaceState({}, '', '/');
-  // De melding staat onderaan de pagina: scroll erheen zodat je hem ook echt ziet
-  document.getElementById('nieuwsbrief').scrollIntoView({ block: 'center' });
+  // De melding staat onderaan de pagina: scroll erheen zodat je hem ook echt ziet.
+  // Pas na het laden (foto's en lettertypes verschuiven de pagina nog), en daarna nog eens om bij te sturen.
+  var naarMelding = function () { document.getElementById('nieuwsbrief').scrollIntoView({ block: 'center' }); };
+  window.addEventListener('load', function () { naarMelding(); setTimeout(naarMelding, 600); });
 }
 </script>
 <script>
