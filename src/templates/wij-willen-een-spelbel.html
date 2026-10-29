@@ -128,6 +128,8 @@
   .verstuur-knop { width: 100%; background: #FFF77A; color: #003D86; border: none; border-radius: 18px; padding: 15px; font-family: 'Tomarik', 'Trebuchet MS', 'Lucida Sans Unicode', Arial, sans-serif; font-size: 20px; font-weight: 600; cursor: pointer; transition: transform 0.12s; margin-top: 6px; display: flex; align-items: center; justify-content: center; gap: 8px; }
   .verstuur-knop:hover { transform: translateY(-2px); }
   .verstuur-knop:active { transform: translateY(1px); }
+  .privacy-noot { margin: 12px 0 0; font-size: 13px; text-align: center; color: #003D86; }
+  .privacy-noot a { color: #003D86; text-decoration: underline; }
   .succes-blok { background: var(--geel); border-radius: 18px; padding: 24px; text-align: center; animation: pop 0.4s ease; }
   @keyframes pop { 0%{transform:scale(0.9);opacity:0;} 100%{transform:scale(1);opacity:1;} }
   .succes-blok h4 { font-family: 'Tomarik', 'Trebuchet MS', 'Lucida Sans Unicode', Arial, sans-serif; font-size: 24px; margin-bottom: 8px; }
@@ -374,7 +376,8 @@ function openFormulier(bestaand, lat, lng) {
     ${plekNaamVeld}
     <label class="checkbox-rij"><input type="checkbox" id="openbaar"><span>Mijn naam mag zichtbaar zijn bij deze speelplek (anders blijf je anoniem)</span></label>
     <label class="checkbox-rij"><input type="checkbox" id="nieuwsbrief"><span>Houd mij op de hoogte van het Spel Bel-avontuur</span></label>
-    <button class="verstuur-knop" onclick="aanmelden()">🔔 Ik wil een Spel Bel!</button>`;
+    <button class="verstuur-knop" onclick="aanmelden()">🔔 Ik wil een Spel Bel!</button>
+    <p class="privacy-noot">Lees hoe we met je gegevens omgaan in onze <a href="/privacy" target="_blank" rel="noopener">privacyverklaring</a>.</p>`;
   openPaneel();
 }
 

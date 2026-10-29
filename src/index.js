@@ -80,7 +80,7 @@ app.get('/wij-willen-een-spelbel', (req, res) => {
     res.send(render('wij-willen-een-spelbel.html', { APP_NAME, APP_URL }));
 });
 
-// Voor gemeenten is nog een testpagina: bereikbaar via de link, maar niet in het menu (en noindex)
+// Voor gemeenten: in het menu, maar nog noindex (Google toont hem niet)
 app.get('/voor-gemeenten', (req, res) => {
     const [vgEmailUser, vgEmailDomain] = (process.env.CONTACT_EMAIL || '@').split('@');
     res.send(render('voor-gemeenten.html', { APP_NAME, APP_URL, CONTACT_EMAIL_USER: vgEmailUser, CONTACT_EMAIL_DOMAIN: vgEmailDomain }));
@@ -89,6 +89,11 @@ app.get('/voor-gemeenten', (req, res) => {
 // Thank you page
 app.get('/thankyou', (req, res) => {
     res.send(render('thankyou.html', { APP_NAME, APP_URL }));
+});
+
+// In de media: eenvoudige lijst met alle nieuwsberichten
+app.get('/in-de-media', (req, res) => {
+    res.send(render('in-de-media.html', { APP_NAME, APP_URL }));
 });
 
 // Privacy policy
