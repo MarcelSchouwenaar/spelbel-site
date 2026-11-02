@@ -155,7 +155,8 @@
     .paneel { width: 100%; }
     .plaats-knop { padding: 8px 16px; font-size: 14px; gap: 6px; }
     .kaart-hint { max-width: calc(100% - 24px); width: calc(100% - 24px); left: 12px; right: 12px; transform: none; }
-    .kaart-hint.plaatsen { bottom: auto; top: 68px; left: 12px; right: 12px; transform: none; }
+    .kaart-hint.plaatsen { bottom: auto; top: 68px; left: 12px; right: 12px; transform: none; animation-name: hint-puls-mobiel; }
+    @keyframes hint-puls-mobiel { 0%,100%{transform:scale(1);} 50%{transform:scale(1.03);} }
   }
   @media screen and (max-width: 768px) { .btn-header { display: none; } }
 </style>
