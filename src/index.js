@@ -16,7 +16,8 @@ const APP_URL = (process.env.APP_URL || '').replace(/\/$/, '');
 // connections mid-response ("Premature close") under normal traffic.
 const INTERNAL_API_URL = (process.env.INTERNAL_API_URL || APP_URL).replace(/\/$/, '');
 const APP_NAME = process.env.APP_NAME || 'SpelBel';
-const CLUSTER_AFSTAND = 0.003;
+// Aanmeldingen binnen deze afstand (in graden, ca. 55 m noord-zuid, 35 m oost-west) tellen als dezelfde plek. Houd gelijk aan de kaartpagina.
+const CLUSTER_AFSTAND = 0.0005;
 
 // Railway's edge is the one hop in front of us: req.ip is then the real client.
 app.set('trust proxy', 1);

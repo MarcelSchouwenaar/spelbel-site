@@ -546,7 +546,7 @@ body.privacy-page { line-height: 1.7; }
 .media h1 { font-size: clamp(2rem, 4.5vw, 3rem); text-transform: uppercase; margin-bottom: 32px; }
 .media-lijst { list-style: none; border-top: 2px solid #003D86; }
 .media-lijst li { border-bottom: 2px solid #003D86; }
-.media-lijst a { display: block; padding: 18px 0; color: #003D86; text-decoration: none; }
+.media-lijst a, .media-print { display: block; padding: 18px 0; color: #003D86; text-decoration: none; }
 .media-lijst a:hover .media-titel { text-decoration: underline; }
 .media-bron { display: block; font-size: .85rem; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #186ED5; margin-bottom: 4px; }
 .media-titel { display: block; font-size: 1.15rem; font-weight: 600; line-height: 1.4; }
@@ -586,6 +586,34 @@ body.privacy-page { line-height: 1.7; }
 .manual-table th { font-weight: 700; }
 .content code { background: #f2f2f2; border-radius: 6px; padding: 1px 6px; font-size: .9em; }
 
+/* Handleidingen in de stijl van de rest van de site: donkerblauw, zachte kaders, blauwe stapnummers */
+.manual-page { color: #003D86; }
+.manual-page .content { padding-top: 150px; }
+.manual-page .content h2 { font-size: clamp(2rem, 4.5vw, 3rem); line-height: 1.1; text-transform: uppercase; margin-bottom: 12px; }
+.manual-page .updated { color: #003D86; opacity: .75; font-size: .95rem; }
+.manual-page .content a { color: #186ED5; text-decoration: underline; text-underline-offset: 3px; }
+.manual-page .toc { background: #E0DCFF; border: 0; box-shadow: none; border-radius: 24px; padding: 24px 28px; margin-bottom: 48px; }
+.manual-page .toc a { color: #003D86; text-decoration: none; }
+.manual-page .toc a:hover { text-decoration: underline; }
+.manual-page .content h3 { font-size: 1.6rem; margin: 56px 0 12px; padding-top: 28px; border-top: 2px solid #E0DCFF; scroll-margin-top: 90px; }
+.manual-page .content h4 { font-size: 1.15rem; margin: 28px 0 8px; }
+.manual-page .content ol.steps-list { list-style: none; counter-reset: stap; margin-left: 0; }
+.manual-page .content ol.steps-list li { counter-increment: stap; position: relative; padding-left: 44px; margin-bottom: 12px; }
+.manual-page .content ol.steps-list li::before {
+  content: counter(stap); position: absolute; left: 0; top: 0;
+  width: 30px; height: 30px; border-radius: 50%; background: #186ED5; color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Tomarik', 'Trebuchet MS', Arial, sans-serif; font-size: .95rem; line-height: 1;
+}
+.manual-page .content figure img { border: 0; border-radius: 20px; box-shadow: 0 8px 28px rgba(0, 61, 134, .15); }
+.manual-page .content figcaption { color: #003D86; opacity: .75; }
+.manual-page .manual-table { border-collapse: separate; border-spacing: 0; border-radius: 16px; overflow: hidden; background: #F4F2FF; }
+.manual-page .manual-table th { background: #003D86; color: #fff; }
+.manual-page .manual-table th, .manual-page .manual-table td { padding: 12px 14px; border-bottom: 1px solid #E0DCFF; }
+.manual-page .manual-table tr:last-child td { border-bottom: 0; }
+.manual-page .content code { background: #FFF77A; color: #003D86; }
+@media (max-width: 768px) { .manual-page .content { padding-top: 120px; } }
+
 /* Tablet: nog naast elkaar, met minder ruimte rond de tekst */
 @media screen and (max-width: 905px) {
   .hero-text { padding: 100px 24px 40px 32px; }
@@ -595,7 +623,7 @@ body.privacy-page { line-height: 1.7; }
 @media screen and (max-width: 768px) {
   .hero { display: flex; flex-direction: column-reverse; height: auto; }
   .hero-text { text-align: left; align-items: flex-start; padding: 40px 24px; }
-  .hero-foto img { height: auto; }
+  .hero-foto img { height: auto; aspect-ratio: 1 / 1; object-position: 45% center; }
   .hero h2 { font-size: min(2.5rem, 10vw); }
   .btn-hero { font-size: 1rem; }
 }
@@ -856,7 +884,7 @@ body.auth-page {
 }
 
 @media screen and (max-width: 640px) {
-  .stat-cards { grid-template-columns: 1fr; gap: 0px; }
+  .stat-cards { grid-template-columns: 1fr; gap: 20px; }
   .stat-card { padding: 40px 28px; }
   .stat-num { font-size: 3.5rem; }
   .solution-blob { padding: 60px 40px; }
