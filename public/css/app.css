@@ -205,7 +205,7 @@ a:hover {
 .hero-text {
   color: #fff;
   text-align: left;
-  padding: 60px 80px 80px 80px;
+  padding: 160px 80px 80px 80px;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -435,9 +435,9 @@ a:hover {
 .step-text strong { display: block; margin-bottom: 2px; }
 .step-text span { color: #003D86; }
 
-.stores { display: flex; flex-wrap: wrap; justify-content: center; gap: 16px; margin-top: 32px; }
-.btn-store { display: inline-block; margin: 0; background: #003D86; color: #fff; border: 3px solid #003D86; transition: transform .15s; text-align: center; }
-.btn-store:hover { color: #fff; transform: translateY(-2px); }
+.stores { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 16px; margin-top: 32px; }
+.stores img { display: block; }
+.stores-legal { margin-top: 16px; font-size: .75rem; text-align: center; }
 
 .channels { padding: 56px 24px; }
 .channels-inner { max-width: 600px; margin: 0 auto; text-align: center; }
@@ -541,6 +541,19 @@ body.thankyou-page {
 /* ── Privacy page ──────────────────────────────────────── */
 body.privacy-page { line-height: 1.7; }
 
+/* ── In de media ─────────────────────────────────────────── */
+.media { max-width: 720px; margin: 0 auto; padding: 150px 24px 80px; color: #003D86; }
+.media h1 { font-size: clamp(2rem, 4.5vw, 3rem); text-transform: uppercase; margin-bottom: 32px; }
+.media-lijst { list-style: none; border-top: 2px solid #003D86; }
+.media-lijst li { border-bottom: 2px solid #003D86; }
+.media-lijst a, .media-print { display: block; padding: 18px 0; color: #003D86; text-decoration: none; }
+.media-lijst a:hover .media-titel { text-decoration: underline; }
+.media-bron { display: block; font-size: .85rem; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #186ED5; margin-bottom: 4px; }
+.media-titel { display: block; font-size: 1.15rem; font-weight: 600; line-height: 1.4; }
+.news-alles { text-align: center; }
+.news-alles a { color: #003D86; font-weight: 700; text-decoration: underline; text-underline-offset: 4px; }
+@media (max-width: 768px) { .media { padding-top: 120px; } }
+
 
 
 .content { max-width: 640px; margin: 0 auto; padding: 48px 24px 80px; }
@@ -573,6 +586,34 @@ body.privacy-page { line-height: 1.7; }
 .manual-table th { font-weight: 700; }
 .content code { background: #f2f2f2; border-radius: 6px; padding: 1px 6px; font-size: .9em; }
 
+/* Handleidingen in de stijl van de rest van de site: donkerblauw, zachte kaders, blauwe stapnummers */
+.manual-page { color: #003D86; }
+.manual-page .content { padding-top: 150px; }
+.manual-page .content h2 { font-size: clamp(2rem, 4.5vw, 3rem); line-height: 1.1; text-transform: uppercase; margin-bottom: 12px; }
+.manual-page .updated { color: #003D86; opacity: .75; font-size: .95rem; }
+.manual-page .content a { color: #186ED5; text-decoration: underline; text-underline-offset: 3px; }
+.manual-page .toc { background: #E0DCFF; border: 0; box-shadow: none; border-radius: 24px; padding: 24px 28px; margin-bottom: 48px; }
+.manual-page .toc a { color: #003D86; text-decoration: none; }
+.manual-page .toc a:hover { text-decoration: underline; }
+.manual-page .content h3 { font-size: 1.6rem; margin: 56px 0 12px; padding-top: 28px; border-top: 2px solid #E0DCFF; scroll-margin-top: 90px; }
+.manual-page .content h4 { font-size: 1.15rem; margin: 28px 0 8px; }
+.manual-page .content ol.steps-list { list-style: none; counter-reset: stap; margin-left: 0; }
+.manual-page .content ol.steps-list li { counter-increment: stap; position: relative; padding-left: 44px; margin-bottom: 12px; }
+.manual-page .content ol.steps-list li::before {
+  content: counter(stap); position: absolute; left: 0; top: 0;
+  width: 30px; height: 30px; border-radius: 50%; background: #186ED5; color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Tomarik', 'Trebuchet MS', Arial, sans-serif; font-size: .95rem; line-height: 1;
+}
+.manual-page .content figure img { border: 0; border-radius: 20px; box-shadow: 0 8px 28px rgba(0, 61, 134, .15); }
+.manual-page .content figcaption { color: #003D86; opacity: .75; }
+.manual-page .manual-table { border-collapse: separate; border-spacing: 0; border-radius: 16px; overflow: hidden; background: #F4F2FF; }
+.manual-page .manual-table th { background: #003D86; color: #fff; }
+.manual-page .manual-table th, .manual-page .manual-table td { padding: 12px 14px; border-bottom: 1px solid #E0DCFF; }
+.manual-page .manual-table tr:last-child td { border-bottom: 0; }
+.manual-page .content code { background: #FFF77A; color: #003D86; }
+@media (max-width: 768px) { .manual-page .content { padding-top: 120px; } }
+
 /* Tablet: nog naast elkaar, met minder ruimte rond de tekst */
 @media screen and (max-width: 905px) {
   .hero-text { padding: 100px 24px 40px 32px; }
@@ -582,7 +623,7 @@ body.privacy-page { line-height: 1.7; }
 @media screen and (max-width: 768px) {
   .hero { display: flex; flex-direction: column-reverse; height: auto; }
   .hero-text { text-align: left; align-items: flex-start; padding: 40px 24px; }
-  .hero-foto img { height: auto; }
+  .hero-foto img { height: auto; aspect-ratio: 1 / 1; object-position: 45% center; }
   .hero h2 { font-size: min(2.5rem, 10vw); }
   .btn-hero { font-size: 1rem; }
 }
@@ -786,6 +827,23 @@ body.auth-page {
   font-weight: 400;
 }
 
+/* ── Pilot met Jantje Beton ───────────────────────────────── */
+.pilot { padding: 64px 24px; background: #3A8CEE; color: #fff; }
+.pilot-inner { max-width: 960px; margin: 0 auto; display: flex; align-items: center; gap: 48px; }
+.pilot-foto { flex: 0 0 40%; width: 40%; aspect-ratio: 2 / 3; object-fit: cover; border-radius: 24px; display: block; }
+.pilot-logo { display: inline-block; margin-bottom: 16px; }
+.pilot-logo img { display: block; width: 110px; height: auto; }
+.pilot h2 { font-size: 2.5rem; font-weight: 700; margin-bottom: 16px; }
+.pilot p { font-size: 1.1rem; line-height: 1.5; margin-bottom: 12px; }
+.pilot p a { color: #fff; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; }
+.btn-pilot { display: inline-block; margin-top: 8px; padding: 12px 24px; border-radius: 999px; background: #FFF77A; color: #003D86; font-family: 'Tomarik', 'Trebuchet MS', 'Lucida Sans Unicode', Arial, sans-serif; font-weight: 700; text-decoration: none; }
+@media (max-width: 640px) {
+  .pilot-inner { flex-direction: column; align-items: flex-start; gap: 24px; }
+  .pilot-foto { flex: none; width: 100%; aspect-ratio: 4 / 5; }
+  .pilot-logo img { width: 90px; }
+  .pilot h2 { font-size: 2rem; }
+}
+
 /* ── Solution Section ─────────────────────────────────────── */
 .solution {
   padding: 100px 24px;
@@ -826,7 +884,7 @@ body.auth-page {
 }
 
 @media screen and (max-width: 640px) {
-  .stat-cards { grid-template-columns: 1fr; gap: 0px; }
+  .stat-cards { grid-template-columns: 1fr; gap: 20px; }
   .stat-card { padding: 40px 28px; }
   .stat-num { font-size: 3.5rem; }
   .solution-blob { padding: 60px 40px; }
@@ -910,6 +968,11 @@ body.auth-page {
 .vg-logos img { max-width: 100%; max-height: 80px; object-fit: contain; }
 .vg-logos span { font-family: 'Tomarik', 'Trebuchet MS', Arial, sans-serif; font-size: 1.4rem; text-transform: uppercase; }
 .vg-foto-staand { display: block; width: 100%; max-height: 560px; aspect-ratio: 4 / 5; object-fit: cover; object-position: center 60%; border-radius: 24px; }
+.vg-privacy { background: #E0DCFF; }
+.vg-privacy-kaart { background: #fff; border-radius: 24px; padding: 28px; }
+.vg-privacy-kaart p { margin: 0; }
+.vg-privacy-link { margin: 28px 0 0 !important; font-weight: 800; }
+.vg-kaarten-2 { grid-template-columns: repeat(2, 1fr); }
 .vg-plekken { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
 .vg-plek p { margin: 0; }
 .vg-opening { font-weight: 800; font-size: .9rem; color: #3A8CEE; margin-top: 6px !important; }
@@ -925,6 +988,9 @@ body.auth-page {
 .vg-form input:focus, .vg-form textarea:focus { outline: none; border-color: #003D86; }
 .vg-form-rij { display: flex; gap: 18px; }
 .vg-form .vg-knop { align-self: flex-start; border: 0; cursor: pointer; padding: 14px 28px; }
+.vg-honeypot { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
+.vg-melding { margin: 0; font-weight: 800; min-height: 1.5em; }
+.vg-form { position: relative; }
 .vg-form .vg-klein { margin: 0; color: #5A6360; }
 
 @media screen and (max-width: 900px) {
@@ -1058,9 +1124,10 @@ body.auth-page {
 
 .news-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 24px;
+  grid-template-columns: 3fr 2fr;
+  gap: 32px;
   margin-bottom: 32px;
+  align-items: start;
 }
 
 .news-hero {
@@ -1082,10 +1149,7 @@ body.auth-page {
   height: 280px;
   overflow: hidden;
   background: #f0f0f0;
-  -webkit-mask-image: url('../images/blobbly-mask.svg');
-  -webkit-mask-size: 100% 100%;
-  mask-image: url('../images/blobbly-mask.svg');
-  mask-size: 100% 100%;
+  border-radius: 20px;
 }
 
 .news-image-container img {
@@ -1135,4 +1199,30 @@ body.auth-page {
 
 .news-other a:hover {
   color: #1652D4;
+}
+
+/* Uitgelicht nieuws links, drie kleine kaarten rechts */
+.news-uitgelicht .news-image-container { position: relative; height: 380px; }
+.news-uitgelicht .news-hero-title { font-size: 1.1rem; margin-bottom: 8px; text-align: left; }
+.news-uitgelicht .news-hero-content p:last-child { font-size: 1.4rem; line-height: 1.3; }
+.news-play {
+  position: absolute; left: 20px; bottom: 20px; width: 72px; height: 72px;
+  border-radius: 50%; background: #FFF77A;
+}
+.news-play::after {
+  content: ''; position: absolute; left: 29px; top: 22px;
+  border-style: solid; border-width: 14px 0 14px 22px; border-color: transparent transparent transparent #003D86;
+}
+.news-meta { display: flex; align-items: center; gap: 10px; font-size: .85rem !important; font-weight: 600; margin-bottom: 10px !important; }
+.news-nieuw { background: #186ED5; color: #fff; border-radius: 99px; padding: 3px 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; font-size: .75rem; }
+.news-lijst { display: flex; flex-direction: column; gap: 20px; }
+.news-klein { flex-direction: row; align-items: center; height: auto; }
+.news-klein .news-image-container { flex: 0 0 120px; width: 120px; height: 120px; border-radius: 16px; }
+.news-klein .news-hero-content { padding: 0 0 0 16px; }
+.news-klein .news-hero-title { font-size: .85rem; margin-bottom: 4px; text-align: left; letter-spacing: 0; }
+.news-klein .news-hero-content p { font-size: .9rem; }
+@media (max-width: 768px) {
+  .news-grid { grid-template-columns: 1fr; }
+  .news-uitgelicht .news-image-container { height: 260px; }
+  .news-klein .news-image-container { flex-basis: 96px; width: 96px; height: 96px; }
 }

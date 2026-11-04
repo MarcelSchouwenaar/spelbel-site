@@ -6,7 +6,7 @@ const { render } = require('./lib/render');
 const { parentPagesProxy } = require('./proxy');
 const { pool, init: initDb, purgeOld } = require('./lib/db');
 const multer = require('multer');
-const { sendVerificationEmail, sendNewsletterVerificationEmail, sendOwnerNotificationEmail, addToMailingList, sendWelcomeEmail, sendBelbaasEmail } = require('./lib/email');
+const { sendVerificationEmail, sendNewsletterVerificationEmail, sendOwnerNotificationEmail, addToMailingList, sendWelcomeEmail, sendBelbaasEmail, sendBrochureRequestEmail } = require('./lib/email');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -16,7 +16,8 @@ const APP_URL = (process.env.APP_URL || '').replace(/\/$/, '');
 // connections mid-response ("Premature close") under normal traffic.
 const INTERNAL_API_URL = (process.env.INTERNAL_API_URL || APP_URL).replace(/\/$/, '');
 const APP_NAME = process.env.APP_NAME || 'SpelBel';
-const CLUSTER_AFSTAND = 0.003;
+// Aanmeldingen binnen deze afstand (in graden, ca. 55 m noord-zuid, 35 m oost-west) tellen als dezelfde plek. Houd gelijk aan de kaartpagina.
+const CLUSTER_AFSTAND = 0.0005;
 
 // Railway's edge is the one hop in front of us: req.ip is then the real client.
 app.set('trust proxy', 1);
@@ -80,7 +81,7 @@ app.get('/wij-willen-een-spelbel', (req, res) => {
     res.send(render('wij-willen-een-spelbel.html', { APP_NAME, APP_URL }));
 });
 
-// Voor gemeenten is nog een testpagina: bereikbaar via de link, maar niet in het menu (en noindex)
+// Voor gemeenten: in het menu, maar nog noindex (Google toont hem niet)
 app.get('/voor-gemeenten', (req, res) => {
     const [vgEmailUser, vgEmailDomain] = (process.env.CONTACT_EMAIL || '@').split('@');
     res.send(render('voor-gemeenten.html', { APP_NAME, APP_URL, CONTACT_EMAIL_USER: vgEmailUser, CONTACT_EMAIL_DOMAIN: vgEmailDomain }));
@@ -89,6 +90,11 @@ app.get('/voor-gemeenten', (req, res) => {
 // Thank you page
 app.get('/thankyou', (req, res) => {
     res.send(render('thankyou.html', { APP_NAME, APP_URL }));
+});
+
+// In de media: eenvoudige lijst met alle nieuwsberichten
+app.get('/in-de-media', (req, res) => {
+    res.send(render('in-de-media.html', { APP_NAME, APP_URL }));
 });
 
 // Privacy policy
@@ -270,6 +276,26 @@ app.get('/api/verify/:token', async (req, res) => {
 });
 
 // Newsletter signup from homepage — sends verification email
+// Brochure-aanvraag vanaf Voor gemeenten → mail naar het contactadres
+app.post('/api/brochure', async (req, res) => {
+    const { gemeente, naam, functie, email, telefoon, vraag, website } = req.body || {};
+    if (website) return res.json({ ok: true }); // honeypot: bots vullen dit verborgen veld in
+    if (!gemeente || !naam || !email || !String(email).includes('@')) {
+        return res.status(400).json({ error: 'Vul je gemeente, naam en een geldig e-mailadres in.' });
+    }
+    const kort = (v, n) => String(v || '').trim().slice(0, n);
+    try {
+        await sendBrochureRequestEmail({
+            gemeente: kort(gemeente, 120), naam: kort(naam, 120), functie: kort(functie, 120),
+            email: kort(email, 200), telefoon: kort(telefoon, 40), vraag: kort(vraag, 2000),
+        });
+        res.json({ ok: true });
+    } catch (err) {
+        console.error('[API] /api/brochure error:', err.message);
+        res.status(500).json({ error: 'Versturen mislukt.' });
+    }
+});
+
 app.post('/api/newsletter', async (req, res) => {
     const { email } = req.body || {};
     if (!email || !email.includes('@')) return res.status(400).json({ error: 'Ongeldig e-mailadres.' });
