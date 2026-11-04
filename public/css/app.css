@@ -435,9 +435,9 @@ a:hover {
 .step-text strong { display: block; margin-bottom: 2px; }
 .step-text span { color: #003D86; }
 
-.stores { display: flex; flex-wrap: wrap; justify-content: center; gap: 16px; margin-top: 32px; }
-.btn-store { display: inline-block; margin: 0; background: #003D86; color: #fff; border: 3px solid #003D86; transition: transform .15s; text-align: center; }
-.btn-store:hover { color: #fff; transform: translateY(-2px); }
+.stores { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 16px; margin-top: 32px; }
+.stores img { display: block; }
+.stores-legal { margin-top: 16px; font-size: .75rem; text-align: center; }
 
 .channels { padding: 56px 24px; }
 .channels-inner { max-width: 600px; margin: 0 auto; text-align: center; }
