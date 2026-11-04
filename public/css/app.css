@@ -437,7 +437,6 @@ a:hover {
 
 .stores { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 16px; margin-top: 32px; }
 .stores img { display: block; }
-.stores-legal { margin-top: 16px; font-size: .75rem; text-align: center; }
 
 .channels { padding: 56px 24px; }
 .channels-inner { max-width: 600px; margin: 0 auto; text-align: center; }
@@ -477,6 +476,7 @@ a:hover {
 .footer-cols a { display: block; color: #fff; text-decoration: none; margin-bottom: 6px; }
 .footer-cols a:hover { color: #FFF77A; text-decoration: underline; }
 .footer-credit { max-width: 1000px; margin: 32px auto 0; text-align: center; font-size: .8rem; }
+.footer-legal { max-width: 1000px; margin: 8px auto 0; text-align: center; font-size: .7rem; }
 .footer-credit a { color: #fff; }
 .footer-credit a:hover { color: #FFF77A; }
 
