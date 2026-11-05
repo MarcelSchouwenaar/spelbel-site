@@ -103,9 +103,9 @@ app.get('/privacy', (req, res) => {
     res.send(render('privacy.html', { APP_NAME, APP_URL, CONTACT_EMAIL_USER: emailUser, CONTACT_EMAIL_DOMAIN: emailDomain }));
 });
 
-// ── Belbaas admin ─────────────────────────────────────────
-// Simple form to send the welcome email to a new Belbaas.
-// Het Belbaas-formulier bestaat alleen lokaal (niet op Railway, via localhost); online geeft het een 404.
+// ── BelBaas admin ─────────────────────────────────────────
+// Simple form to send the welcome email to a new BelBaas.
+// Het BelBaas-formulier bestaat alleen lokaal (niet op Railway, via localhost); online geeft het een 404.
 function isLocalDev(req) {
     return !process.env.RAILWAY_ENVIRONMENT_NAME && !process.env.RAILWAY_ENVIRONMENT
         && ['localhost', '127.0.0.1'].includes(req.hostname);

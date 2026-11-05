@@ -249,7 +249,7 @@ async function sendBelbaasEmail({ naam, email, code, link, plek, datum, tijd, bi
             sender: { email: sender, name: 'SpelBel' },
             to: [{ email, name: naam }],
             bcc: [{ email: 'info@spelbel.nl' }],
-            subject: '🔔 Welkom, Belbaas!',
+            subject: '🔔 Welkom, BelBaas!',
             htmlContent: buildBelbaasEmailHtml({ naam, code, link, plek, datum, tijd }),
             ...(bijlage ? { attachment: [{ content: bijlage.content, name: bijlage.name }] } : {}),
         }),
@@ -292,15 +292,15 @@ function buildBelbaasEmailHtml({ naam, code, link, plek, datum, tijd }) {
 <tr><td style="padding:0;"><img src="https://www.spelbel.nl/images/belbaas-welkom.jpg" alt="SpelBel op de speelplaats" width="600" style="display:block;width:100%;max-width:600px;height:auto;"></td></tr>
 
 <tr><td style="padding:32px 32px 8px 32px;font-size:16px;line-height:1.6;color:#1f2933;">
-<p style="margin:0 0 16px 0;font-size:22px;font-weight:bold;">Welkom, Belbaas!</p>
+<p style="margin:0 0 16px 0;font-size:22px;font-weight:bold;">Welkom, BelBaas!</p>
 <p style="margin:0 0 16px 0;">Hoi ${naam},</p>
-<p style="margin:0 0 16px 0;">${intro} En jij gaat er iets heel moois van maken, want jij bent vanaf nu de Belbaas. Als Belbaas ben jij het hart van de SpelBel in de wijk.</p>
-<p style="margin:0 0 8px 0;font-weight:bold;">Wat doet een Belbaas?</p>
+<p style="margin:0 0 16px 0;">${intro} En jij gaat er iets heel moois van maken, want jij bent vanaf nu de BelBaas. Als BelBaas ben jij het hart van de SpelBel in de wijk.</p>
+<p style="margin:0 0 8px 0;font-weight:bold;">Wat doet een BelBaas?</p>
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:16px;">
   <tr><td style="padding:6px 0;vertical-align:top;width:24px;font-size:16px;">🔔</td><td style="padding:6px 0;font-size:16px;line-height:1.5;color:#1f2933;"><strong>De bel in de gaten houden.</strong> Zie je dat er iets met de bel is, of heb je vragen? Mail naar <a href="mailto:info@spelbel.nl" style="color:#D9601A;">info@spelbel.nl</a>. In de app zie je of de SpelBel online is, hoeveel batterij er nog is en wanneer er voor het laatst aangebeld is. <em>Tip: let op dat niemand een sticker over de QR-code plakt. Er zijn mensen die zo anderen proberen op te lichten.</em></td></tr>
   <tr><td style="padding:6px 0;vertical-align:top;width:24px;font-size:16px;">⏰</td><td style="padding:6px 0;font-size:16px;line-height:1.5;color:#1f2933;"><strong>De tijden van de bel instellen.</strong> Jij stelt in de app in op welke tijden de bel kan afgaan. Aangemelde ouders willen natuurlijk niet tijdens schooltijden gestoord worden!</td></tr>
   <tr><td style="padding:6px 0;vertical-align:top;width:24px;font-size:16px;">🔬</td><td style="padding:6px 0;font-size:16px;line-height:1.5;color:#1f2933;"><strong>Meedoen aan het onderzoek van Jantje Beton.</strong> Dit is een van de 5 eerste SpelBellen in Nederland, en Jantje Beton doet er onderzoek naar. Daarom nemen we na de opening nog 2 keer contact met je op om te kijken hoe het gaat met de SpelBel. Vind je dat goed?</td></tr>
-  <tr><td style="padding:6px 0;vertical-align:top;width:24px;font-size:16px;">🎉</td><td style="padding:6px 0;font-size:16px;line-height:1.5;color:#1f2933;"><strong>Erbij zijn als de bel voor het eerst gaat.</strong> We stellen je op de opening voor als de Belbaas, zodat de buren meteen weten wie je bent en waar ze met vragen terechtkunnen.</td></tr>
+  <tr><td style="padding:6px 0;vertical-align:top;width:24px;font-size:16px;">🎉</td><td style="padding:6px 0;font-size:16px;line-height:1.5;color:#1f2933;"><strong>Erbij zijn als de bel voor het eerst gaat.</strong> We stellen je op de opening voor als de BelBaas, zodat de buren meteen weten wie je bent en waar ze met vragen terechtkunnen.</td></tr>
 </table>
 </td></tr>
 
@@ -320,7 +320,7 @@ ${openingBlok}
 <tr><td style="padding:8px 32px 8px 32px;font-size:16px;line-height:1.6;color:#1f2933;">
 <p style="margin:0 0 8px 0;font-weight:bold;">Wat is je adres?</p>
 <p style="margin:0 0 16px 0;">Naar welk adres mogen we het pakketje sturen? Mail ons even je postadres, dan zorgen wij dat het snel bij je is.</p>
-<p style="margin:0 0 16px 0;">Heel veel plezier, Belbaas! Samen zorgen we dat er nog meer buiten gespeeld wordt in de buurt.</p>
+<p style="margin:0 0 16px 0;">Heel veel plezier, BelBaas! Samen zorgen we dat er nog meer buiten gespeeld wordt in de buurt.</p>
 <p style="margin:0 0 16px 0;">Heb je vragen? Stuur ons gerust een bericht!</p>
 <p style="margin:0 0 32px 0;">Een speelse groet,<br><strong>Puck &amp; Marcel van Spel Bel</strong></p>
 </td></tr>
